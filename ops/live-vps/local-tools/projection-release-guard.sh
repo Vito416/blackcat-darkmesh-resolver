@@ -32,6 +32,8 @@ Options:
   --domains <csv>               Comma-separated domains.
   --domains-file <path>         One domain per line.
   --worker-base-url <url>       Async worker base URL.
+  --projection-path <path>      Projection fetch path for active snapshot checks.
+                                Default: /resolver/projection/current
   --control-state-url <url>     Optional authenticated control-state current URL.
                                 No default in minimal-exposed-surface mode.
   --control-auth-token <token>  Optional bearer token for control-state fetch.
@@ -60,6 +62,7 @@ REPO_ROOT="$(cd "$SCRIPT_DIR/../../.." && pwd)"
 RELEASE_SCRIPT="$REPO_ROOT/ops/live-vps/local-tools/projection-release.sh"
 
 WORKER_BASE_URL="${DARKMESH_ASYNC_WORKER_BASE_URL:-}"
+PROJECTION_PATH="${DARKMESH_PROJECTION_DISTRIBUTION_PATH:-/resolver/projection/current}"
 CONTROL_STATE_URL="${DARKMESH_RESOLVER_CONTROL_STATE_URL:-}"
 CONTROL_AUTH_TOKEN="${RESOLVER_CONTROL_AUTH_TOKEN:-}"
 DOMAINS_CSV=""
@@ -79,6 +82,7 @@ while [[ $# -gt 0 ]]; do
     --domains) DOMAINS_CSV="${2:-}"; shift 2 ;;
     --domains-file) DOMAINS_FILE="${2:-}"; shift 2 ;;
     --worker-base-url) WORKER_BASE_URL="${2:-}"; shift 2 ;;
+    --projection-path) PROJECTION_PATH="${2:-}"; shift 2 ;;
     --control-state-url) CONTROL_STATE_URL="${2:-}"; shift 2 ;;
     --control-auth-token) CONTROL_AUTH_TOKEN="${2:-}"; shift 2 ;;
     --min-valid-sec) MIN_VALID_SEC="${2:-}"; shift 2 ;;
@@ -103,6 +107,10 @@ bash -n "$RELEASE_SCRIPT" >/dev/null
 
 [[ -n "$WORKER_BASE_URL" ]] || {
   echo "--worker-base-url or DARKMESH_ASYNC_WORKER_BASE_URL is required" >&2
+  exit 2
+}
+[[ "$PROJECTION_PATH" == /* ]] || {
+  echo "--projection-path must start with /" >&2
   exit 2
 }
 
@@ -130,7 +138,7 @@ else
   mkdir -p "$OUTPUT_DIR"
 fi
 
-CURRENT_URL="${WORKER_BASE_URL%/}/resolver/projection/current"
+CURRENT_URL="${WORKER_BASE_URL%/}${PROJECTION_PATH}"
 CURRENT_PATH="$OUTPUT_DIR/current-projection.json"
 CONTROL_STATE_PATH="$OUTPUT_DIR/control-state-current.json"
 DECISION_PATH="$OUTPUT_DIR/guard-decision.json"
@@ -307,6 +315,7 @@ fi
 
 release_args=(
   --worker-base-url "$WORKER_BASE_URL"
+  --projection-path "$PROJECTION_PATH"
   --output-dir "$OUTPUT_DIR/release"
   --ttl-sec "$RELEASE_TTL_SEC"
   --refresh-cadence-sec "$REFRESH_CADENCE_SEC"

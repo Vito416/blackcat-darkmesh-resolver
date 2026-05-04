@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-WORKER_CURRENT_URL="${WORKER_CURRENT_URL:-https://blackcat-async-worker.vitek-pasek.workers.dev/resolver/projection/current}"
+WORKER_PROJECTION_URL="${WORKER_PROJECTION_URL:-${WORKER_CURRENT_URL:-https://blackcat-async-worker.vitek-pasek.workers.dev/resolver/projection/current}}"
 CONTROL_STATE_URL="${CONTROL_STATE_URL:-}"
 CONTROL_AUTH_TOKEN="${RESOLVER_CONTROL_AUTH_TOKEN:-}"
 NODE_STATE_URL="${NODE_STATE_URL:-https://hyperbeam.darkmesh.fun/~darkmesh-resolver@1.0/GetResolverState}"
@@ -19,13 +19,14 @@ Usage:
   joined-node-smoke.sh [options]
 
 Verifies that a joined serving node:
-  - sees the same current signed projection sequence as the control-plane
+  - sees the same active signed projection sequence as the control-plane
   - is active and verificationReason=ok
   - returns ALLOW_ROUTE_HOST_BOUND for expected hosts
   - optionally still serves public URLs / write guard as expected
 
 Options:
-  --worker-current-url <url>   Current signed snapshot URL.
+  --worker-projection-url <u>  Active signed snapshot URL.
+  --worker-current-url <url>   Compatibility alias for --worker-projection-url.
   --control-state-url <url>    Optional authenticated control-state current URL.
                                No default in minimal-exposed-surface mode.
   --control-auth-token <tok>   Optional bearer token for control-state fetch.
@@ -49,7 +50,7 @@ trap cleanup EXIT
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
-    --worker-current-url) WORKER_CURRENT_URL="${2:-}"; shift 2 ;;
+    --worker-projection-url|--worker-current-url) WORKER_PROJECTION_URL="${2:-}"; shift 2 ;;
     --control-state-url) CONTROL_STATE_URL="${2:-}"; shift 2 ;;
     --control-auth-token) CONTROL_AUTH_TOKEN="${2:-}"; shift 2 ;;
     --node-state-url) NODE_STATE_URL="${2:-}"; shift 2 ;;
@@ -119,9 +120,9 @@ check_public_status() {
   fi
 }
 
-echo "[1/4] Fetch control-plane current snapshot"
+echo "[1/4] Fetch control-plane active snapshot"
 worker_current_json="$tmp_dir/worker-current.json"
-fetch_json "$WORKER_CURRENT_URL" "$worker_current_json"
+fetch_json "$WORKER_PROJECTION_URL" "$worker_current_json"
 worker_sequence="$(jq -r '.sequence // empty' "$worker_current_json")"
 worker_key_id="$(jq -r '.keyId // empty' "$worker_current_json")"
 worker_payload_hash="$(jq -r '.payloadHash // empty' "$worker_current_json")"

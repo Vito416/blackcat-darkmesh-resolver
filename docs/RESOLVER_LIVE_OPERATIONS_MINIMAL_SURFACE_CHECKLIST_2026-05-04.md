@@ -85,7 +85,7 @@ Without control-state helper read:
 
 ```bash
 bash ops/live-vps/local-tools/joined-node-smoke.sh \
-  --worker-current-url https://blackcat-async-worker.vitek-pasek.workers.dev/resolver/projection/current \
+  --worker-projection-url https://blackcat-async-worker.vitek-pasek.workers.dev/resolver/projection/current \
   --node-state-url https://hyperbeam.darkmesh.fun/~darkmesh-resolver@1.0/GetResolverState \
   --node-read-base-url https://hyperbeam.darkmesh.fun
 ```
@@ -96,7 +96,7 @@ With explicit private control-state read:
 export RESOLVER_CONTROL_AUTH_TOKEN=...
 
 bash ops/live-vps/local-tools/joined-node-smoke.sh \
-  --worker-current-url https://blackcat-async-worker.vitek-pasek.workers.dev/resolver/projection/current \
+  --worker-projection-url https://blackcat-async-worker.vitek-pasek.workers.dev/resolver/projection/current \
   --control-state-url https://<private-control-surface>/resolver/control/state/current \
   --node-state-url https://hyperbeam.darkmesh.fun/~darkmesh-resolver@1.0/GetResolverState \
   --node-read-base-url https://hyperbeam.darkmesh.fun

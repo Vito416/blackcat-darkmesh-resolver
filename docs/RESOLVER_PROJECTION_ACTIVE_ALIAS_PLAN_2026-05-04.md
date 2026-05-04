@@ -75,6 +75,14 @@ At this point:
 - no joined-node config has to change immediately
 - no rollback complexity is introduced
 
+Tooling is already being prepared for that phase by preferring neutral
+operator flags such as:
+
+- `--worker-projection-url`
+- `--projection-path`
+
+instead of hard-coding the word `current` into new operator examples.
+
 ### Phase 3 - move examples and operator defaults
 
 After the alias exists:

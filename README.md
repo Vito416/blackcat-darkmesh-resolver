@@ -339,7 +339,7 @@ Smoke-check a joined serving node:
 export RESOLVER_CONTROL_AUTH_TOKEN=...
 
 bash ops/live-vps/local-tools/joined-node-smoke.sh \
-  --worker-current-url https://blackcat-async-worker.vitek-pasek.workers.dev/resolver/projection/current \
+  --worker-projection-url https://blackcat-async-worker.vitek-pasek.workers.dev/resolver/projection/current \
   --control-state-url https://<private-control-surface>/resolver/control/state/current \
   --node-state-url https://hyperbeam.darkmesh.fun/~darkmesh-resolver@1.0/GetResolverState \
   --node-read-base-url https://hyperbeam.darkmesh.fun \
@@ -353,6 +353,15 @@ bash ops/live-vps/local-tools/joined-node-smoke.sh \
 When the control token and an explicit control-state URL are present,
 joined-node smoke also checks the live control-plane AO health summary before
 it compares projection state.
+
+Alias-readiness note:
+
+- `joined-node-smoke.sh` and `dynamic-mode-scout.sh` now prefer the neutral
+  `--worker-projection-url` flag
+- `--worker-current-url` still works as a compatibility alias
+- `projection-release.sh` and `projection-release-guard.sh` now also accept
+  `--projection-path`, so we can move to `/resolver/projection/active` later
+  without rewriting the scripts themselves
 
 Scout current D2 readiness without mutating production:
 

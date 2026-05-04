@@ -9,7 +9,7 @@ Usage:
 Non-destructive D2 scout for DarkMesh Resolver.
 
 What it does:
-  1. fetch current signed projection from control-plane
+  1. fetch active signed projection from control-plane
   2. fetch joined-node resolver state
   3. fetch joined-node DNS refresh state
   4. probe which D2 read/control surfaces are publicly exposed today
@@ -17,7 +17,8 @@ What it does:
   6. write a report JSON + captured responses
 
 Options:
-  --worker-current-url <url>   Remote current signed projection URL.
+  --worker-projection-url <u>  Remote active signed projection URL.
+  --worker-current-url <url>   Compatibility alias for --worker-projection-url.
   --node-state-url <url>       Joined node GetResolverState URL.
   --dns-state-url <url>        Joined node GetDnsRefreshState URL.
   --admission-url <url>        Optional GetAdmissionState URL probe.
@@ -46,7 +47,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/../../.." && pwd)"
 RELEASE_SCRIPT="$REPO_ROOT/ops/live-vps/local-tools/projection-release.sh"
 
-WORKER_CURRENT_URL="${WORKER_CURRENT_URL:-https://blackcat-async-worker.vitek-pasek.workers.dev/resolver/projection/current}"
+WORKER_PROJECTION_URL="${WORKER_PROJECTION_URL:-${WORKER_CURRENT_URL:-https://blackcat-async-worker.vitek-pasek.workers.dev/resolver/projection/current}}"
 NODE_STATE_URL="${NODE_STATE_URL:-https://hyperbeam.darkmesh.fun/~darkmesh-resolver@1.0/GetResolverState}"
 DNS_STATE_URL="${DNS_STATE_URL:-https://hyperbeam.darkmesh.fun/~darkmesh-resolver@1.0/GetDnsRefreshState}"
 ADMISSION_URL="${ADMISSION_URL:-https://hyperbeam.darkmesh.fun/~darkmesh-resolver@1.0/GetAdmissionState}"
@@ -62,7 +63,7 @@ RELEASE_DRY_RUN=0
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
-    --worker-current-url) WORKER_CURRENT_URL="${2:-}"; shift 2 ;;
+    --worker-projection-url|--worker-current-url) WORKER_PROJECTION_URL="${2:-}"; shift 2 ;;
     --node-state-url) NODE_STATE_URL="${2:-}"; shift 2 ;;
     --dns-state-url) DNS_STATE_URL="${2:-}"; shift 2 ;;
     --admission-url) ADMISSION_URL="${2:-}"; shift 2 ;;
@@ -135,9 +136,9 @@ safe_probe_json() {
     '{url:$url,method:$method,httpCode:($code|tonumber),bodyFile:$bodyFile}'
 }
 
-echo "[1/6] Fetch control-plane current projection"
+echo "[1/6] Fetch control-plane active projection"
 worker_current_file="$OUTPUT_DIR/worker-current.json"
-worker_code="$(fetch_any GET "$WORKER_CURRENT_URL" "$worker_current_file")"
+worker_code="$(fetch_any GET "$WORKER_PROJECTION_URL" "$worker_current_file")"
 [[ "$worker_code" == "200" ]] || {
   echo "failed to fetch worker current: HTTP $worker_code" >&2
   exit 1
@@ -232,7 +233,8 @@ fi
 jq -n \
   --arg generatedAt "$(date -u +"%Y-%m-%dT%H:%M:%SZ")" \
   --arg outputDir "$OUTPUT_DIR" \
-  --arg workerCurrentUrl "$WORKER_CURRENT_URL" \
+  --arg workerProjectionUrl "$WORKER_PROJECTION_URL" \
+  --arg workerCurrentUrl "$WORKER_PROJECTION_URL" \
   --arg nodeStateUrl "$NODE_STATE_URL" \
   --arg dnsStateUrl "$DNS_STATE_URL" \
   --argjson projectionInSync "$projection_in_sync" \
@@ -249,6 +251,7 @@ jq -n \
   '{
     generatedAt:$generatedAt,
     outputDir:$outputDir,
+    workerProjectionUrl:$workerProjectionUrl,
     workerCurrentUrl:$workerCurrentUrl,
     nodeStateUrl:$nodeStateUrl,
     dnsStateUrl:$dnsStateUrl,

@@ -34,6 +34,8 @@ Useful options:
   --domains <csv>              Comma-separated domains.
   --domains-file <path>        One domain per line.
   --worker-base-url <url>      Async worker base URL.
+  --projection-path <path>     Projection fetch path for verification.
+                               Default: /resolver/projection/current
   --sequence <n|auto>          Projection sequence. Default: auto
   --ttl-sec <n>                Projection TTL / expiresAt horizon. Passed to builder.
   --refresh-cadence-sec <n>    cacheHints.refreshCadenceSec. Passed to builder.
@@ -172,6 +174,7 @@ PROJECTION_TOOL="$REPO_ROOT/scripts/projection-envelope-tool.py"
 DOMAINS_CSV=""
 DOMAINS_FILE=""
 WORKER_BASE_URL="${DARKMESH_ASYNC_WORKER_BASE_URL:-}"
+PROJECTION_PATH="${DARKMESH_PROJECTION_DISTRIBUTION_PATH:-/resolver/projection/current}"
 SEQUENCE_MODE="auto"
 TTL_SEC=""
 REFRESH_CADENCE_SEC=""
@@ -201,6 +204,7 @@ while [[ $# -gt 0 ]]; do
     --domains) DOMAINS_CSV="${2:-}"; shift 2 ;;
     --domains-file) DOMAINS_FILE="${2:-}"; shift 2 ;;
     --worker-base-url) WORKER_BASE_URL="${2:-}"; shift 2 ;;
+    --projection-path) PROJECTION_PATH="${2:-}"; shift 2 ;;
     --sequence) SEQUENCE_MODE="${2:-}"; shift 2 ;;
     --ttl-sec) TTL_SEC="${2:-}"; shift 2 ;;
     --refresh-cadence-sec) REFRESH_CADENCE_SEC="${2:-}"; shift 2 ;;
@@ -242,6 +246,10 @@ bash -n "$PUBLISH_HELPER" >/dev/null
   echo "--worker-base-url or DARKMESH_ASYNC_WORKER_BASE_URL is required" >&2
   exit 2
 }
+[[ "$PROJECTION_PATH" == /* ]] || {
+  echo "--projection-path must start with /" >&2
+  exit 2
+}
 
 if [[ -z "$DOMAINS_CSV" && -z "$DOMAINS_FILE" && "${#POSITIONAL_DOMAINS[@]}" -eq 0 ]]; then
   echo "provide domains via --domains, --domains-file, or positional args" >&2
@@ -276,7 +284,7 @@ else
   mkdir -p "$OUTPUT_DIR"
 fi
 
-CURRENT_URL="${WORKER_BASE_URL%/}/resolver/projection/current"
+CURRENT_URL="${WORKER_BASE_URL%/}${PROJECTION_PATH}"
 SIGN_URL="${WORKER_BASE_URL%/}/resolver/projection/sign"
 PUBLISH_URL="${WORKER_BASE_URL%/}/resolver/projection/publish"
 UNSIGNED_PATH="$OUTPUT_DIR/resolver-projection.unsigned.v2.json"
