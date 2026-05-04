@@ -18,7 +18,7 @@ Auth:
   or pass --auth-token <token>
 
 Live publish:
-  --worker-url https://async.example.workers.dev/resolver/control/state/publish
+  --worker-url https://<private-control-surface>/resolver/control/state/publish
 USAGE
 }
 

@@ -44,6 +44,10 @@ Where it is used:
 - `ops/live-vps/local-tools/publish-control-state-via-async-worker.sh`
 - README / AO-control-state docs examples
 
+Current repo examples now treat that URL as a private/operator surface:
+
+- `https://<private-control-surface>/resolver/control/state/publish`
+
 Why it stays for now:
 
 - it lets us publish normalized control summaries without turning them into

@@ -90,7 +90,7 @@ directly:
 export RESOLVER_CONTROL_AUTH_TOKEN=...
 
 bash ops/live-vps/local-tools/publish-control-state-via-async-worker.sh \
-  --worker-url https://blackcat-async-worker.vitek-pasek.workers.dev/resolver/control/state/publish \
+  --worker-url https://<private-control-surface>/resolver/control/state/publish \
   --report /tmp/dynamic-mode-scout-report.json \
   --admission-state /tmp/darkmesh-ao-state/admission-state.json \
   --due-hosts-state /tmp/darkmesh-ao-state/due-hosts-state.json \
