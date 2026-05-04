@@ -1,0 +1,84 @@
+name: Resolver Projection Guard
+
+on:
+  schedule:
+    - cron: "*/30 * * * *"
+  workflow_dispatch:
+    inputs:
+      force:
+        description: "Force a publish even if the current snapshot is still healthy"
+        required: false
+        default: false
+        type: boolean
+      dry_run:
+        description: "Evaluate the guard but skip publish"
+        required: false
+        default: false
+        type: boolean
+
+concurrency:
+  group: resolver-projection-guard
+  cancel-in-progress: false
+
+jobs:
+  guard:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      DARKMESH_ASYNC_WORKER_BASE_URL: https://blackcat-async-worker.vitek-pasek.workers.dev
+      DARKMESH_PROJECTION_DOMAINS: jdwt.fun,vddl.fun,blgateway.fun
+      DARKMESH_PROJECTION_MIN_VALID_SEC: "1800"
+      DARKMESH_PROJECTION_RELEASE_TTL_SEC: "86400"
+      DARKMESH_PROJECTION_REFRESH_CADENCE_SEC: "300"
+      DARKMESH_PROJECTION_LKG_MAX_AGE_SEC: "3600"
+      RESOLVER_SIGNER_AUTH_TOKEN: ${{ secrets.RESOLVER_SIGNER_AUTH_TOKEN }}
+      RESOLVER_PUBLISH_AUTH_TOKEN: ${{ secrets.RESOLVER_PUBLISH_AUTH_TOKEN }}
+      RESOLVER_CONTROL_AUTH_TOKEN: ${{ secrets.RESOLVER_CONTROL_AUTH_TOKEN }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate control-plane auth config
+        run: |
+          test -n "${RESOLVER_SIGNER_AUTH_TOKEN}"
+          test -n "${RESOLVER_PUBLISH_AUTH_TOKEN}"
+          test -n "${RESOLVER_CONTROL_AUTH_TOKEN}"
+
+      - name: Run projection guard
+        env:
+          OUTPUT_DIR: ${{ runner.temp }}/resolver-projection-guard
+          EVENT_NAME: ${{ github.event_name }}
+          FORCE_INPUT: ${{ inputs.force }}
+          DRY_RUN_INPUT: ${{ inputs.dry_run }}
+        run: |
+          set -euo pipefail
+          rm -rf "$OUTPUT_DIR"
+          mkdir -p "$OUTPUT_DIR"
+
+          FORCE_FLAG=""
+          DRY_RUN_FLAG=""
+          if [[ "$EVENT_NAME" == "workflow_dispatch" && "$FORCE_INPUT" == "true" ]]; then
+            FORCE_FLAG="--force"
+          fi
+          if [[ "$EVENT_NAME" == "workflow_dispatch" && "$DRY_RUN_INPUT" == "true" ]]; then
+            DRY_RUN_FLAG="--dry-run"
+          fi
+
+          bash ops/live-vps/local-tools/projection-release-guard.sh \
+            --domains "${DARKMESH_PROJECTION_DOMAINS}" \
+            --worker-base-url "${DARKMESH_ASYNC_WORKER_BASE_URL}" \
+            --min-valid-sec "${DARKMESH_PROJECTION_MIN_VALID_SEC}" \
+            --release-ttl-sec "${DARKMESH_PROJECTION_RELEASE_TTL_SEC}" \
+            --refresh-cadence-sec "${DARKMESH_PROJECTION_REFRESH_CADENCE_SEC}" \
+            --lkg-max-age-sec "${DARKMESH_PROJECTION_LKG_MAX_AGE_SEC}" \
+            --output-dir "$OUTPUT_DIR" \
+            ${FORCE_FLAG} \
+            ${DRY_RUN_FLAG}
+
+      - name: Upload guard artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: resolver-projection-guard
+          path: ${{ runner.temp }}/resolver-projection-guard
+          if-no-files-found: warn

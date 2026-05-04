@@ -1,0 +1,8 @@
+# Managed by ops automation. Copy to:
+#   /etc/nginx/snippets/darkmesh-resolver-pid.conf
+# and keep updated from /srv/darkmesh/hb/data/rolling/darkmesh-resolver.pid.
+#
+# Example:
+# set $dm_resolver_pid "Uven0OZv1rHZjmkDkSFP3yDhZF3aMI0lk6ouoBciuSM";
+
+set $dm_resolver_pid "";

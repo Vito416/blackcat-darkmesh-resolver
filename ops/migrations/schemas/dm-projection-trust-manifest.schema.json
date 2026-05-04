@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://darkmesh.fun/schemas/dm1/dm-projection-trust-manifest.schema.json",
+  "title": "DarkMesh projection trust manifest",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "mode",
+    "allowedSigners",
+    "keys",
+    "requireExpiry",
+    "maxFutureSkewSec",
+    "maxPastAgeSec",
+    "allowRollback",
+    "minSequence"
+  ],
+  "properties": {
+    "schemaVersion": { "const": "dm-projection-trust/1" },
+    "mode": { "enum": ["bootstrap", "production"] },
+    "allowedSigners": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1, "maxLength": 256 },
+      "uniqueItems": true,
+      "minItems": 1
+    },
+    "keys": {
+      "type": "object",
+      "minProperties": 1,
+      "patternProperties": {
+        "^.{1,256}$": {
+          "type": "object",
+          "required": ["alg", "publicKey"],
+          "properties": {
+            "alg": { "enum": ["ed25519"] },
+            "publicKey": { "type": "string", "minLength": 1, "maxLength": 512 },
+            "status": { "enum": ["active", "retired"] },
+            "notBefore": { "type": "string", "format": "date-time" },
+            "notAfter": { "type": "string", "format": "date-time" }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "requireExpiry": { "type": "boolean" },
+    "maxFutureSkewSec": { "type": "integer", "minimum": 0, "maximum": 86400 },
+    "maxPastAgeSec": { "type": "integer", "minimum": 0, "maximum": 604800 },
+    "allowRollback": { "type": "boolean" },
+    "minSequence": { "type": "integer", "minimum": 0, "maximum": 9223372036854775807 },
+    "allowBootstrapUnverified": { "type": "boolean" },
+    "notes": { "type": "string", "minLength": 0, "maxLength": 2000 }
+  },
+  "additionalProperties": false,
+  "patternProperties": {
+    "^x-": {}
+  }
+}

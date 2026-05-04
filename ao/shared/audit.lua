@@ -1,0 +1,173 @@
+-- Append-only audit stub for local testing.
+
+local Audit = {}
+local records = {}
+local LOG_DIR = os.getenv "AUDIT_LOG_DIR" or "arweave/manifests"
+local MAX_IN_MEMORY = tonumber(os.getenv "AUDIT_MAX_RECORDS" or "1000")
+local FORMAT = os.getenv "AUDIT_FORMAT" or "line" -- line | ndjson
+local ROTATE_MAX = tonumber(os.getenv "AUDIT_ROTATE_MAX" or "1048576") -- bytes
+local RETAIN_FILES = tonumber(os.getenv "AUDIT_RETAIN_FILES" or "10") -- number of rotated files per stream
+
+local function ensure_dir(path)
+  os.execute(string.format('mkdir -p "%s"', path))
+end
+
+local function is_array(tbl)
+  local i = 0
+  for _ in pairs(tbl) do
+    i = i + 1
+    if tbl[i] == nil then
+      return false
+    end
+  end
+  return true
+end
+
+local function json_encode(value)
+  local t = type(value)
+  if t == "nil" then
+    return "null"
+  end
+  if t == "boolean" then
+    return value and "true" or "false"
+  end
+  if t == "number" then
+    return tostring(value)
+  end
+  if t == "string" then
+    return string.format("%q", value)
+  end
+  if t == "table" then
+    if is_array(value) then
+      local parts = {}
+      for _, v in ipairs(value) do
+        table.insert(parts, json_encode(v))
+      end
+      return "[" .. table.concat(parts, ",") .. "]"
+    else
+      local parts = {}
+      for k, v in pairs(value) do
+        table.insert(parts, string.format("%q:%s", k, json_encode(v)))
+      end
+      return "{" .. table.concat(parts, ",") .. "}"
+    end
+  end
+  return '"<unsupported>"'
+end
+
+local lfs_ok, lfs = pcall(require, "lfs")
+
+local function rotate_if_needed(path)
+  if not path or path == "" then
+    return
+  end
+  local f = io.open(path, "r")
+  if not f then
+    return
+  end
+  local content = f:read "*a"
+  f:close()
+  if #content >= ROTATE_MAX then
+    local rotated = path .. "." .. os.date "!%Y%m%d%H%M%S"
+    os.rename(path, rotated)
+    if lfs_ok then
+      -- retention
+      local dir, file = path:match "(.+)/([^/]+)$"
+      local prefix = file .. "."
+      local rotated_files = {}
+      for rfile in lfs.dir(dir) do
+        if rfile:find("^" .. prefix) then
+          table.insert(rotated_files, dir .. "/" .. rfile)
+        end
+      end
+      table.sort(rotated_files, function(a, b)
+        return a > b
+      end) -- newest first (lexicographic on timestamp suffix)
+      for i = RETAIN_FILES + 1, #rotated_files do
+        os.remove(rotated_files[i])
+      end
+    end
+  end
+end
+
+function Audit.append(entry)
+  if os.getenv "AUDIT_DISABLE" == "1" then
+    return true
+  end
+  if not entry.ts then
+    entry.ts = os.date "!%Y-%m-%dT%H:%M:%SZ"
+  end
+  table.insert(records, entry)
+  if #records > MAX_IN_MEMORY then
+    table.remove(records, 1)
+  end
+  if LOG_DIR then
+    ensure_dir(LOG_DIR)
+    local path = string.format("%s/audit.log", LOG_DIR)
+    rotate_if_needed(path)
+    local f = io.open(path, "a")
+    if f then
+      if FORMAT == "ndjson" then
+        f:write(json_encode(entry), "\n")
+      else
+        f:write(tostring(entry.action or "event"), " ", json_encode(entry), "\n")
+      end
+      f:close()
+    end
+  end
+end
+
+-- Helper to record a normalized event
+-- fields: process, action, requestId, actorRole, siteId, resultCode
+function Audit.record(process, action, msg, resp, extra)
+  local entry = {
+    process = process,
+    action = action,
+    requestId = msg and msg["Request-Id"],
+    actorRole = msg and (msg["Actor-Role"] or msg.actorRole),
+    siteId = msg and (msg["Site-Id"] or msg.siteId),
+    status = resp and resp.status,
+    resultCode = resp and resp.code or resp and resp.status,
+  }
+  if extra then
+    for k, v in pairs(extra) do
+      entry[k] = v
+    end
+  end
+  Audit.append(entry)
+  -- optional per-process log
+  if LOG_DIR and process then
+    local path = string.format("%s/audit-%s.log", LOG_DIR, process)
+    rotate_if_needed(path)
+    local f = io.open(path, "a")
+    if f then
+      if FORMAT == "ndjson" then
+        f:write(json_encode(entry), "\n")
+      else
+        f:write(tostring(entry.action or "event"), " ", json_encode(entry), "\n")
+      end
+      f:close()
+    end
+  end
+end
+
+function Audit.all()
+  return records
+end
+
+function Audit.log_path()
+  return LOG_DIR and (LOG_DIR .. "/audit.log") or nil
+end
+
+function Audit.process_log_path(process)
+  if not LOG_DIR or not process then
+    return nil
+  end
+  return string.format("%s/audit-%s.log", LOG_DIR, process)
+end
+
+function Audit._clear()
+  records = {}
+end
+
+return Audit

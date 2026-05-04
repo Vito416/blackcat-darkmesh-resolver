@@ -1,0 +1,5 @@
+# Legacy placeholder retained for readers of older rollout notes.
+# Host routing no longer lives in a server{} snippet because large host sets do
+# not scale well as a long if-chain. The active runtime now writes:
+#   /etc/nginx/conf.d/darkmesh-host-routing-map.conf
+# See ../conf.d/darkmesh-host-routing-map.conf.example for the actual format.

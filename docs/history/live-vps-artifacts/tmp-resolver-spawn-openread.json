@@ -1,0 +1,16 @@
+{
+  "pid": "USniKfMhzvdj6hHKQo41PhN5IuvwgfqwL2O9q78P-Ss",
+  "module": "1uHPA2ZmyV5ruQr9_1z7kZ30QdwpDkBN5E4BE64WZG0",
+  "name": "darkmesh-resolver-live-openread",
+  "url": "https://write.darkmesh.fun",
+  "scheduler": "_wCF37G9t-xfJuYZqc6JXI9VrG4dzM5WUFgDfOn9LdM",
+  "spawnPath": "/push",
+  "variant": "ao.TN.1",
+  "executionDevice": "genesis-wasm@1.0",
+  "contentType": "application/wasm",
+  "moduleFormat": "wasm64-unknown-emscripten-draft_2024_02_15",
+  "wasmProfile": true,
+  "status": 200,
+  "mode": "extended",
+  "pidFromHeader": "USniKfMhzvdj6hHKQo41PhN5IuvwgfqwL2O9q78P-Ss"
+}

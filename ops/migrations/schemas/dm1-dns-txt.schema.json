@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://darkmesh.fun/schemas/dm1/dns-txt.schema.json",
+  "title": "Darkmesh DM1 DNS TXT Envelope (validated)",
+  "description": "Canonical DM1 DNS TXT envelope used as domain ownership/config pointer.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "v",
+    "cfg",
+    "kid",
+    "ttl"
+  ],
+  "properties": {
+    "v": {
+      "const": "dm1"
+    },
+    "cfg": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_-]{32,128}$",
+      "description": "Arweave tx id with config payload."
+    },
+    "kid": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_-]{32,128}$",
+      "description": "Owner key id/address expected to match config signature authority."
+    },
+    "ttl": {
+      "type": "integer",
+      "minimum": 60,
+      "maximum": 86400
+    },
+    "seq": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 2147483647,
+      "description": "Optional monotonic sequence for anti-rollback enforcement."
+    }
+  },
+  "patternProperties": {
+    "^x-": {}
+  },
+  "x-runtimeRules": [
+    "Raw TXT parser MUST reject duplicate keys.",
+    "Raw TXT parser MUST reject unknown keys.",
+    "Domain binding is resolved from _darkmesh.<domain> query context, not from envelope body.",
+    "Unknown extension fields are allowed only under x-* namespace."
+  ]
+}

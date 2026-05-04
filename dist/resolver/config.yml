@@ -1,0 +1,9 @@
+# ao-dev-cli options
+stack_size: 3145728
+initial_memory: 8388608
+maximum_memory: 1073741824
+target: 64
+# extra info
+aos_git_hash: 'd5ff8f44df752b13a1e7bce3ded2a5d84b69287f'
+compute_limit: '9000000000000'
+module_format: 'wasm64-unknown-emscripten-draft_2024_02_15'

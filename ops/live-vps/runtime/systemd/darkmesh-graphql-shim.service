@@ -1,0 +1,20 @@
+[Unit]
+Description=DarkMesh GraphQL metadata shim
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+EnvironmentFile=-/etc/darkmesh/graphql-shim.env
+ExecStart=/usr/local/sbin/darkmesh-graphql-shim.py
+Restart=on-failure
+RestartSec=2
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/cache/darkmesh-graphql-shim
+ReadOnlyPaths=/etc/darkmesh/graphql-shim.env /etc/darkmesh/graphql-shim-allowlist.txt
+
+[Install]
+WantedBy=multi-user.target

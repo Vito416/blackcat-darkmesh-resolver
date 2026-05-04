@@ -1,0 +1,7 @@
+{
+  "bundle": "../blackcat-darkmesh-gateway/ops/live-vps/runtime/hb/addons/darkmesh-resolver@1.0.lua",
+  "name": "darkmesh-resolver-lua-v3",
+  "tx": "aMjvcg0fZAGVxDlJJ648xfn3qZwxxXJoUD3EG2F2yc0",
+  "status": 200,
+  "variant": "ao.TN.1"
+}

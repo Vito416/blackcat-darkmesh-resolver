@@ -1,0 +1,16 @@
+{
+  "pid": "fUykdxVkNDr1z5-Ni0GuW38qUg35s9phFVLB7GedeiQ",
+  "module": "nGLfSppuixEaUjFvAUeH6HL1gDgZSkNDdPNEDyBsnB8",
+  "name": "darkmesh-resolver-lua-final",
+  "url": "https://write.darkmesh.fun",
+  "scheduler": "_wCF37G9t-xfJuYZqc6JXI9VrG4dzM5WUFgDfOn9LdM",
+  "spawnPath": "/push",
+  "variant": "ao.TN.1",
+  "executionDevice": "lua@5.3a",
+  "contentType": "text/lua",
+  "moduleFormat": "lua",
+  "wasmProfile": false,
+  "status": 200,
+  "mode": "extended",
+  "pidFromHeader": "fUykdxVkNDr1z5-Ni0GuW38qUg35s9phFVLB7GedeiQ"
+}

@@ -1,0 +1,17 @@
+[Unit]
+Description=DarkMesh AO projection -> nginx host routing sync
+After=network-online.target nginx.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+EnvironmentFile=-/etc/darkmesh/resolver-projection.env
+ExecStart=/usr/local/sbin/sync-nginx-host-routing.sh
+User=root
+Group=root
+Nice=5
+IOSchedulingClass=best-effort
+IOSchedulingPriority=7
+
+[Install]
+WantedBy=multi-user.target

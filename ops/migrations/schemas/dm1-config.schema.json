@@ -1,0 +1,89 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://darkmesh.fun/schemas/dm1/config.schema.json",
+  "title": "Darkmesh DM1 Config JSON",
+  "description": "Canonical domain config payload used by resolver and worker assertion flows.",
+  "type": "object",
+  "required": [
+    "v",
+    "domain",
+    "siteProcess",
+    "writeProcess",
+    "entryPath",
+    "validFrom",
+    "validTo",
+    "sigAlg",
+    "sig",
+    "nonce",
+    "owner"
+  ],
+  "properties": {
+    "v": {
+      "const": "dm1"
+    },
+    "domain": {
+      "type": "string",
+      "pattern": "^(?=.{1,253}$)(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z0-9-]{2,63}$",
+      "description": "Canonical FQDN (lowercase, no scheme/path)."
+    },
+    "siteProcess": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_-]{20,128}$"
+    },
+    "writeProcess": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_-]{20,128}$"
+    },
+    "entryPath": {
+      "type": "string",
+      "pattern": "^/.*$",
+      "minLength": 1,
+      "maxLength": 1024
+    },
+    "validFrom": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 4102444800
+    },
+    "validTo": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 4102444800
+    },
+    "sigAlg": {
+      "enum": [
+        "rsa-pss-sha256",
+        "ed25519"
+      ]
+    },
+    "sig": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9+/_=-]{32,8192}$"
+    },
+    "nonce": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 512
+    },
+    "owner": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "kid": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    }
+  },
+  "additionalProperties": false,
+  "patternProperties": {
+    "^x-": {}
+  },
+  "x-runtimeRules": [
+    "validTo MUST be strictly greater than validFrom.",
+    "If kid or owner is present, it MUST match TXT envelope kid.",
+    "Cryptographic signature verification is required before promote-to-valid or enforce mode.",
+    "Unknown extension fields are allowed only under x-* namespace for forward compatibility."
+  ]
+}

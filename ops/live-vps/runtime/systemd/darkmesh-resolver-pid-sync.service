@@ -1,0 +1,15 @@
+[Unit]
+Description=Sync DarkMesh resolver PID into nginx snippet
+After=network-online.target nginx.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+Environment=DO_RELOAD=1
+ExecStart=/usr/local/sbin/sync-nginx-resolver-pid.sh
+User=root
+Group=root
+Nice=5
+
+[Install]
+WantedBy=multi-user.target

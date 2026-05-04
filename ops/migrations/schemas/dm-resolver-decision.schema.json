@@ -1,0 +1,176 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://darkmesh.fun/schemas/dm1/resolver-decision.schema.json",
+  "title": "Darkmesh resolver decision payload (ResolveHostForNode / ResolveRouteForHost)",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "requestId",
+    "decision",
+    "reasonCode",
+    "mode",
+    "host",
+    "cache",
+    "proof",
+    "result",
+    "policy"
+  ],
+  "properties": {
+    "schemaVersion": { "const": "1.0" },
+    "requestId": { "type": "string", "minLength": 0, "maxLength": 256 },
+    "decision": { "enum": ["allow", "deny"] },
+    "reasonCode": { "type": "string", "minLength": 1, "maxLength": 256 },
+    "mode": { "enum": ["off", "observe", "soft", "enforce"] },
+    "host": {
+      "type": "string",
+      "pattern": "^(?=.{1,253}$)(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z0-9-]{2,63}$"
+    },
+    "path": { "type": "string", "pattern": "^/.*$", "maxLength": 2048 },
+    "method": { "type": "string", "pattern": "^[A-Z]+$", "maxLength": 16 },
+    "nodeId": { "type": ["string", "null"], "maxLength": 128 },
+    "routeHint": {
+      "type": "object",
+      "required": ["actionHint", "source"],
+      "properties": {
+        "actionHint": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "source": { "type": "string", "minLength": 1, "maxLength": 128 }
+      },
+      "additionalProperties": false
+    },
+    "site": {
+      "type": "object",
+      "required": ["siteId", "host", "status"],
+      "properties": {
+        "siteId": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "host": {
+          "type": "string",
+          "pattern": "^(?=.{1,253}$)(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z0-9-]{2,63}$"
+        },
+        "status": { "type": "string", "minLength": 1, "maxLength": 128 }
+      },
+      "additionalProperties": false
+    },
+    "process": {
+      "type": "object",
+      "required": ["processId"],
+      "properties": {
+        "processId": { "type": "string", "pattern": "^[A-Za-z0-9_-]{20,128}$" },
+        "moduleId": { "type": "string", "pattern": "^[A-Za-z0-9_-]{20,128}$" },
+        "scheduler": { "type": "string", "pattern": "^[A-Za-z0-9_-]{20,128}$" },
+        "routePrefix": { "type": "string", "pattern": "^/.*$", "maxLength": 1024 }
+      },
+      "additionalProperties": false
+    },
+    "proof": {
+      "type": "object",
+      "required": ["dnsProofState"],
+      "properties": {
+        "dnsProofState": { "enum": ["valid", "expired", "missing", "unchecked"] },
+        "dnsProofCheckedAt": { "type": ["string", "null"], "format": "date-time" },
+        "dnsProofValidUntil": { "type": ["string", "null"], "format": "date-time" },
+        "source": { "type": ["string", "null"], "maxLength": 128 },
+        "challengeRef": { "type": ["string", "null"], "maxLength": 256 },
+        "dnsProofSeq": { "type": ["integer", "null"], "minimum": 0, "maximum": 2147483647 }
+      },
+      "additionalProperties": false
+    },
+    "cache": {
+      "type": "object",
+      "required": [
+        "cacheable",
+        "cacheState",
+        "hit",
+        "stale",
+        "negative",
+        "ttlSec",
+        "expiresAt",
+        "positiveTtlSec",
+        "negativeTtlSec",
+        "staleWhileRevalidateSec",
+        "hardMaxStaleSec"
+      ],
+      "properties": {
+        "cacheable": { "type": "boolean" },
+        "key": { "type": "string", "minLength": 1, "maxLength": 256 },
+        "cacheState": { "type": "string", "minLength": 1, "maxLength": 64 },
+        "hit": { "type": "boolean" },
+        "stale": { "type": "boolean" },
+        "staleWhileRevalidate": { "type": "boolean" },
+        "negative": { "type": "boolean" },
+        "ttlSec": { "type": "integer", "minimum": 1, "maximum": 86400 },
+        "expiresAt": { "type": "string", "format": "date-time" },
+        "staleUntilAt": { "type": ["string", "null"], "format": "date-time" },
+        "hardExpiresAt": { "type": ["string", "null"], "format": "date-time" },
+        "revalidateAfterAt": { "type": ["string", "null"], "format": "date-time" },
+        "dnsNextCheckAt": { "type": ["string", "null"], "format": "date-time" },
+        "positiveTtlSec": { "type": "integer", "minimum": 1, "maximum": 86400 },
+        "negativeTtlSec": { "type": "integer", "minimum": 1, "maximum": 86400 },
+        "staleWhileRevalidateSec": { "type": "integer", "minimum": 0, "maximum": 86400 },
+        "hardMaxStaleSec": { "type": "integer", "minimum": 0, "maximum": 172800 }
+      },
+      "additionalProperties": false
+    },
+    "refresh": {
+      "type": "object",
+      "required": ["enabled", "requested", "reason", "source", "nextCheckAt", "paths"],
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "requested": { "type": "boolean" },
+        "reason": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "source": { "type": "string", "minLength": 1, "maxLength": 64 },
+        "nextCheckAt": { "type": ["string", "null"], "format": "date-time" },
+        "refreshRequestedAt": { "type": ["string", "null"], "format": "date-time" },
+        "retryCount": { "type": "integer", "minimum": 0, "maximum": 1000 },
+        "staleRefreshMinIntervalSec": { "type": "integer", "minimum": 0, "maximum": 86400 },
+        "requireChallenge": { "type": "boolean" },
+        "challengeRef": { "type": ["string", "null"], "maxLength": 256 },
+        "challengeExpiresAt": { "type": ["string", "null"], "format": "date-time" },
+        "paths": {
+          "type": "object",
+          "required": ["relayPath", "cachePath", "cronPath"],
+          "properties": {
+            "relayPath": { "type": "string", "pattern": "^/~[a-z0-9-]+@[0-9.]+$", "maxLength": 256 },
+            "cachePath": { "type": "string", "pattern": "^/~[a-z0-9-]+@[0-9.]+$", "maxLength": 256 },
+            "cronPath": { "type": "string", "pattern": "^/~[a-z0-9-]+@[0-9.]+$", "maxLength": 256 }
+          },
+          "additionalProperties": false
+        },
+        "endpoints": {
+          "type": "object",
+          "required": ["dohEndpoint", "arweaveBase"],
+          "properties": {
+            "dohEndpoint": { "type": "string", "pattern": "^https://.+", "maxLength": 512 },
+            "arweaveBase": { "type": "string", "pattern": "^https://.+", "maxLength": 512 }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "result": {
+      "type": "object",
+      "required": ["decision", "reasonCode", "status"],
+      "properties": {
+        "decision": { "enum": ["allow", "deny"] },
+        "reasonCode": { "type": "string", "minLength": 1, "maxLength": 256 },
+        "status": { "enum": ["ALLOW", "DENY"] }
+      },
+      "additionalProperties": false
+    },
+    "policy": {
+      "type": "object",
+      "required": ["mode", "failOpen", "enforceMode", "denyReady"],
+      "properties": {
+        "mode": { "enum": ["off", "observe", "soft", "enforce"] },
+        "failOpen": { "type": "boolean" },
+        "enforceMode": { "type": "boolean" },
+        "denyReady": { "type": "boolean" }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false,
+  "patternProperties": {
+    "^x-": {}
+  }
+}

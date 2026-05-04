@@ -1,0 +1,183 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://darkmesh.fun/schemas/dm1/resolver-policy-bundle.schema.json",
+  "title": "Darkmesh resolver ApplyPolicyBundle payload (v1)",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "snapshotId",
+    "version",
+    "generatedAt",
+    "policyMode",
+    "failOpen",
+    "hostPolicies",
+    "sitePolicies",
+    "dnsProofState",
+    "cacheHints"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "1.0"
+    },
+    "snapshotId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "version": {
+      "const": "dm-resolver-bundle/1"
+    },
+    "generatedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "policyMode": {
+      "enum": ["off", "observe", "soft", "enforce"]
+    },
+    "failOpen": {
+      "type": "boolean"
+    },
+    "cacheHints": {
+      "type": "object",
+      "required": [
+        "positiveTtlSec",
+        "negativeTtlSec",
+        "staleWhileRevalidateSec",
+        "hardMaxStaleSec"
+      ],
+      "properties": {
+        "positiveTtlSec": { "type": "integer", "minimum": 1, "maximum": 86400 },
+        "negativeTtlSec": { "type": "integer", "minimum": 1, "maximum": 86400 },
+        "staleWhileRevalidateSec": { "type": "integer", "minimum": 0, "maximum": 86400 },
+        "hardMaxStaleSec": { "type": "integer", "minimum": 0, "maximum": 172800 }
+      },
+      "additionalProperties": false
+    },
+    "autoDns": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "refreshOnStale": { "type": "boolean" },
+        "refreshIntervalSec": { "type": "integer", "minimum": 30, "maximum": 86400 },
+        "staleRefreshMinIntervalSec": { "type": "integer", "minimum": 0, "maximum": 86400 },
+        "maxHostsPerRun": { "type": "integer", "minimum": 1, "maximum": 500 },
+        "staleGraceSec": { "type": "integer", "minimum": 0, "maximum": 172800 },
+        "requireChallenge": { "type": "boolean" },
+        "challengeTtlSec": { "type": "integer", "minimum": 30, "maximum": 7200 },
+        "relayPath": { "type": "string", "pattern": "^/~[a-z0-9-]+@[0-9.]+$", "maxLength": 256 },
+        "cachePath": { "type": "string", "pattern": "^/~[a-z0-9-]+@[0-9.]+$", "maxLength": 256 },
+        "cronPath": { "type": "string", "pattern": "^/~[a-z0-9-]+@[0-9.]+$", "maxLength": 256 },
+        "dohEndpoint": { "type": "string", "pattern": "^https://.+", "maxLength": 512 },
+        "arweaveBase": { "type": "string", "pattern": "^https://.+", "maxLength": 512 }
+      },
+      "additionalProperties": false
+    },
+    "hostPolicies": {
+      "type": "object",
+      "patternProperties": {
+        "^(?=.{1,253}$)(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z0-9-]{2,63}$": {
+          "type": "object",
+          "required": ["siteId"],
+          "properties": {
+            "siteId": { "type": "string", "minLength": 1, "maxLength": 128 },
+            "processId": { "type": "string", "pattern": "^[A-Za-z0-9_-]{20,128}$" },
+            "moduleId": { "type": "string", "pattern": "^[A-Za-z0-9_-]{20,128}$" },
+            "scheduler": { "type": "string", "pattern": "^[A-Za-z0-9_-]{20,128}$" },
+            "routePrefix": { "type": "string", "pattern": "^/.*$", "maxLength": 1024 },
+            "status": { "type": "string", "minLength": 1, "maxLength": 64 }
+          },
+          "additionalProperties": false,
+          "patternProperties": {
+            "^x-": {}
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "sitePolicies": {
+      "type": "object",
+      "patternProperties": {
+        "^.{1,128}$": {
+          "type": "object",
+          "properties": {
+            "processId": { "type": "string", "pattern": "^[A-Za-z0-9_-]{20,128}$" },
+            "moduleId": { "type": "string", "pattern": "^[A-Za-z0-9_-]{20,128}$" },
+            "scheduler": { "type": "string", "pattern": "^[A-Za-z0-9_-]{20,128}$" },
+            "routePrefix": { "type": "string", "pattern": "^/.*$", "maxLength": 1024 },
+            "status": { "type": "string", "minLength": 1, "maxLength": 64 }
+          },
+          "additionalProperties": false,
+          "patternProperties": {
+            "^x-": {}
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "dnsProofState": {
+      "type": "object",
+      "patternProperties": {
+        "^(?=.{1,253}$)(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z0-9-]{2,63}$": {
+          "type": "object",
+          "required": ["state"],
+          "properties": {
+            "state": { "enum": ["valid", "expired", "missing", "unchecked"] },
+            "checkedAt": { "type": "string", "format": "date-time" },
+            "validUntil": { "type": "string", "format": "date-time" },
+            "source": { "type": "string", "minLength": 1, "maxLength": 128 },
+            "challengeRef": { "type": "string", "minLength": 1, "maxLength": 256 },
+            "sequence": { "type": "integer", "minimum": 0, "maximum": 2147483647 }
+          },
+          "additionalProperties": false,
+          "patternProperties": {
+            "^x-": {}
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "routePolicies": {
+      "type": "object",
+      "patternProperties": {
+        "^(?=.{1,253}$)(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z0-9-]{2,63}$": {
+          "type": "object",
+          "properties": {
+            "defaultActionHint": { "type": "string", "minLength": 1, "maxLength": 128 },
+            "rules": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["pathPrefix"],
+                "properties": {
+                  "pathPrefix": { "type": "string", "pattern": "^/.*$", "maxLength": 1024 },
+                  "methods": {
+                    "type": "array",
+                    "items": { "enum": ["GET", "HEAD", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"] },
+                    "uniqueItems": true,
+                    "minItems": 1
+                  },
+                  "actionHint": { "type": "string", "minLength": 1, "maxLength": 128 }
+                },
+                "additionalProperties": false
+              }
+            }
+          },
+          "additionalProperties": false,
+          "patternProperties": {
+            "^x-": {}
+          }
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false,
+  "patternProperties": {
+    "^x-": {}
+  },
+  "x-runtimeRules": [
+    "ApplyPolicyBundle may be called via message tags or bundle object; this schema describes canonical bundle object.",
+    "Resolver runtime may accept sparse updates, but generated bundles should provide full host/site/proof maps.",
+    "Use policyMode=off and failOpen=true for safe rollout and rollback baseline."
+  ]
+}

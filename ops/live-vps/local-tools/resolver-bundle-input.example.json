@@ -1,0 +1,69 @@
+{
+  "autoDns": {
+    "enabled": true,
+    "refreshOnStale": true,
+    "requireChallenge": true,
+    "challengeTtlSec": 300,
+    "refreshIntervalSec": 300,
+    "staleRefreshMinIntervalSec": 30,
+    "maxHostsPerRun": 100,
+    "staleGraceSec": 900,
+    "relayPath": "/~relay@1.0",
+    "cachePath": "/~cache@1.0",
+    "cronPath": "/~cron@1.0",
+    "dohEndpoint": "https://cloudflare-dns.com/dns-query",
+    "arweaveBase": "https://arweave.net"
+  },
+  "hosts": [
+    {
+      "host": "site-a.example",
+      "siteId": "site-a",
+      "processId": "xIxP6d9N_B6Lr9nI6ddUJPv7wm5xkA9aHf1_l6R2q8Q",
+      "moduleId": "TrNj8CSFaevoYSAsnxuQ97SkdDuPvpkgxR-L6i3QCzY",
+      "scheduler": "_wCF37G9t-xfJuYZqc6JXI9VrG4dzM5WUFgDfOn9LdM",
+      "routePrefix": "/",
+      "status": "active",
+      "proof": {
+        "state": "valid",
+        "checkedAt": "2026-04-24T08:00:00Z",
+        "validUntil": "2026-04-24T09:00:00Z",
+        "source": "dns_txt",
+        "sequence": 42
+      },
+      "route": {
+        "defaultActionHint": "read",
+        "rules": [
+          {
+            "pathPrefix": "/api",
+            "methods": ["GET", "HEAD"],
+            "actionHint": "read"
+          }
+        ]
+      }
+    },
+    {
+      "host": "site-b.example",
+      "siteId": "site-b",
+      "processId": "xIxP6d9N_B6Lr9nI6ddUJPv7wm5xkA9aHf1_l6R2q8Q",
+      "moduleId": "TrNj8CSFaevoYSAsnxuQ97SkdDuPvpkgxR-L6i3QCzY",
+      "scheduler": "_wCF37G9t-xfJuYZqc6JXI9VrG4dzM5WUFgDfOn9LdM",
+      "routePrefix": "/",
+      "status": "active",
+      "proof": {
+        "state": "unchecked"
+      }
+    },
+    {
+      "host": "site-c.example",
+      "siteId": "site-c",
+      "processId": "xIxP6d9N_B6Lr9nI6ddUJPv7wm5xkA9aHf1_l6R2q8Q",
+      "moduleId": "TrNj8CSFaevoYSAsnxuQ97SkdDuPvpkgxR-L6i3QCzY",
+      "scheduler": "_wCF37G9t-xfJuYZqc6JXI9VrG4dzM5WUFgDfOn9LdM",
+      "routePrefix": "/",
+      "status": "active",
+      "proof": {
+        "state": "unchecked"
+      }
+    }
+  ]
+}

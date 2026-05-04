@@ -1,0 +1,23 @@
+[Unit]
+Description=Darkmesh resolver read adapter
+After=network-online.target darkmesh-host-routing-sync.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+EnvironmentFile=-/etc/darkmesh/resolver-adapter.env
+ExecStart=/usr/local/sbin/darkmesh-resolver-read-adapter.py
+Restart=always
+RestartSec=2
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+ReadOnlyPaths=/var/lib/darkmesh/host-routing
+ReadWritePaths=/run
+
+[Install]
+WantedBy=multi-user.target

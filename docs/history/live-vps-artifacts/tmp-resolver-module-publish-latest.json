@@ -1,0 +1,8 @@
+{
+  "wasm": "dist/resolver/process.wasm",
+  "name": "blackcat-ao-darkmesh-resolver-v1",
+  "tx": "05Psr5qxXo9p-dge6A7CFicVWIrIiRlIeCZYVNJUfAI",
+  "status": 400,
+  "variant": "ao.TN.1",
+  "moduleFormat": "wasm64-unknown-emscripten-draft_2024_02_15"
+}

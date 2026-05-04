@@ -1,0 +1,163 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://darkmesh.fun/schemas/dm1/dm-hostmap-envelope-v2.schema.json",
+  "title": "DarkMesh signed host-routing projection envelope (v2)",
+  "type": "object",
+  "required": [
+    "version",
+    "snapshotId",
+    "sequence",
+    "generatedAt",
+    "expiresAt",
+    "signedBy",
+    "keyId",
+    "signatureAlg",
+    "signature",
+    "payloadHash",
+    "payload"
+  ],
+  "properties": {
+    "version": { "const": "dm-hostmap-envelope.v2" },
+    "snapshotId": { "type": "string", "minLength": 1, "maxLength": 256 },
+    "sequence": { "type": "integer", "minimum": 0, "maximum": 9223372036854775807 },
+    "generatedAt": { "type": "string", "format": "date-time" },
+    "expiresAt": { "type": "string", "format": "date-time" },
+    "signedBy": { "type": "string", "minLength": 1, "maxLength": 256 },
+    "keyId": { "type": "string", "minLength": 1, "maxLength": 256 },
+    "signatureAlg": {
+      "enum": ["bootstrap-none", "ed25519"]
+    },
+    "signature": { "type": "string", "minLength": 1, "maxLength": 4096 },
+    "payloadHash": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$"
+    },
+    "previousSnapshotHash": {
+      "type": ["string", "null"],
+      "pattern": "^sha256:[a-f0-9]{64}$"
+    },
+    "issuedByNode": { "type": "string", "minLength": 1, "maxLength": 256 },
+    "issuedByResolver": { "type": "string", "minLength": 1, "maxLength": 256 },
+    "payload": {
+      "type": "object",
+      "required": [
+        "version",
+        "authority",
+        "source",
+        "cacheHints",
+        "entries"
+      ],
+      "properties": {
+        "version": { "const": "dm-hostmap.v2" },
+        "authority": {
+          "type": "object",
+          "required": ["mode", "sourceType"],
+          "properties": {
+            "mode": { "enum": ["bootstrap", "signed"] },
+            "sourceType": { "enum": ["dm1", "ao", "manual", "mixed"] },
+            "resolverId": { "type": "string", "minLength": 1, "maxLength": 256 },
+            "trustDomain": { "type": "string", "minLength": 1, "maxLength": 256 }
+          },
+          "additionalProperties": false
+        },
+        "source": {
+          "type": "object",
+          "properties": {
+            "description": { "type": "string", "minLength": 1, "maxLength": 512 },
+            "domains": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "pattern": "^(?=.{1,253}$)(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z0-9-]{2,63}$"
+              },
+              "uniqueItems": true
+            },
+            "cfgTxs": {
+              "type": "array",
+              "items": { "type": "string", "pattern": "^[A-Za-z0-9_-]{43}$" },
+              "uniqueItems": true
+            }
+          },
+          "additionalProperties": false
+        },
+        "cacheHints": {
+          "type": "object",
+          "required": ["refreshCadenceSec", "lkgMaxAgeSec"],
+          "properties": {
+            "refreshCadenceSec": { "type": "integer", "minimum": 10, "maximum": 86400 },
+            "lkgMaxAgeSec": { "type": "integer", "minimum": 0, "maximum": 604800 }
+          },
+          "additionalProperties": false
+        },
+        "entries": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["host", "enabled", "targetType", "pathPrefix"],
+            "properties": {
+              "host": {
+                "type": "string",
+                "pattern": "^(?=.{1,253}$)(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z0-9-]{2,63}$"
+              },
+              "hosts": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "pattern": "^(?=.{1,253}$)(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z0-9-]{2,63}$"
+                },
+                "uniqueItems": true,
+                "minItems": 1
+              },
+              "enabled": { "type": "boolean" },
+              "siteId": { "type": "string", "minLength": 1, "maxLength": 128 },
+              "cfgTx": { "type": "string", "pattern": "^[A-Za-z0-9_-]{43}$" },
+              "targetType": { "enum": ["process", "tx"] },
+              "targetPid": { "type": "string", "pattern": "^[A-Za-z0-9_-]{43}$" },
+              "targetTx": { "type": "string", "pattern": "^[A-Za-z0-9_-]{43}$" },
+              "pathPrefix": { "type": "string", "pattern": "^/.*$", "maxLength": 1024 },
+              "canonicalHost": {
+                "type": "string",
+                "pattern": "^(?=.{1,253}$)(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z0-9-]{2,63}$"
+              },
+              "nodePool": { "type": "string", "minLength": 1, "maxLength": 128 },
+              "x-meta": { "type": "object" }
+            },
+            "oneOf": [
+              { "required": ["host"] },
+              { "required": ["hosts"] }
+            ],
+            "allOf": [
+              {
+                "if": { "properties": { "targetType": { "const": "process" } } },
+                "then": { "required": ["targetPid"] }
+              },
+              {
+                "if": { "properties": { "targetType": { "const": "tx" } } },
+                "then": { "required": ["targetTx"] }
+              }
+            ],
+            "additionalProperties": false,
+            "patternProperties": {
+              "^x-": {}
+            }
+          }
+        }
+      },
+      "additionalProperties": false,
+      "patternProperties": {
+        "^x-": {}
+      }
+    }
+  },
+  "additionalProperties": false,
+  "patternProperties": {
+    "^x-": {}
+  },
+  "x-runtimeRules": [
+    "Production mode requires signatureAlg=ed25519 and verified signature over canonical payload bytes.",
+    "Bootstrap mode may use signatureAlg=bootstrap-none only when explicitly allowed by node policy.",
+    "Activation should reject expired envelopes and stale rollback sequences unless rollback mode is explicitly enabled.",
+    "payloadHash should be calculated over canonical payload JSON, not over nginx snippet output."
+  ]
+}

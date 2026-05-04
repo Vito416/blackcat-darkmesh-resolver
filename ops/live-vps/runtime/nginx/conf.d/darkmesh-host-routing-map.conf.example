@@ -1,0 +1,9 @@
+# Managed by sync-nginx-host-routing.sh. Do not edit manually.
+# This file belongs in nginx http{} context, typically via /etc/nginx/conf.d/*.conf.
+# It intentionally uses nginx map instead of a long server{} if-chain so large
+# host sets stay cheap to evaluate per request.
+map_hash_bucket_size 128;
+map_hash_max_size 4096;
+map $host $dm_host_target_prefix {
+    default "";
+}

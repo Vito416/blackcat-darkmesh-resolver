@@ -1,0 +1,23 @@
+{
+  "schemaVersion": "dm-projection-trust/1",
+  "mode": "production",
+  "allowedSigners": [
+    "darkmesh-resolver-mainnet"
+  ],
+  "keys": {
+    "darkmesh-projection-key-2026-q2": {
+      "alg": "ed25519",
+      "publicKey": "base64:REPLACE_WITH_REAL_ED25519_PUBLIC_KEY",
+      "status": "active",
+      "notBefore": "2026-04-01T00:00:00Z",
+      "notAfter": "2026-07-01T00:00:00Z"
+    }
+  },
+  "requireExpiry": true,
+  "maxFutureSkewSec": 120,
+  "maxPastAgeSec": 86400,
+  "allowRollback": false,
+  "minSequence": 0,
+  "allowBootstrapUnverified": false,
+  "notes": "Install to /etc/darkmesh/projection-trust.json on stock-HB companion nodes."
+}

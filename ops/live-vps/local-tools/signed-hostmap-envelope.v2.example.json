@@ -1,0 +1,61 @@
+{
+  "version": "dm-hostmap-envelope.v2",
+  "snapshotId": "projection-2026-04-30T22-15-00Z",
+  "sequence": 42,
+  "generatedAt": "2026-04-30T22:15:00Z",
+  "expiresAt": "2026-04-30T22:25:00Z",
+  "signedBy": "darkmesh-resolver-mainnet",
+  "keyId": "darkmesh-projection-key-2026-q2",
+  "signatureAlg": "ed25519",
+  "signature": "base64:REPLACE_WITH_REAL_SIGNATURE",
+  "payloadHash": "sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+  "previousSnapshotHash": "sha256:abcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcd",
+  "issuedByNode": "resolver-control-eu-1",
+  "issuedByResolver": "darkmesh-resolver-v2",
+  "payload": {
+    "version": "dm-hostmap.v2",
+    "authority": {
+      "mode": "signed",
+      "sourceType": "dm1",
+      "resolverId": "darkmesh-resolver-v2",
+      "trustDomain": "darkmesh.fun"
+    },
+    "source": {
+      "description": "DM1 bootstrap projection for jdwt/vddl/blgateway",
+      "domains": ["jdwt.fun", "vddl.fun", "blgateway.fun"],
+      "cfgTxs": [
+        "2PZ2YpFCukV7AgPM3J5ZXzT1bVg46K6dG6VDtmHeN-s",
+        "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB"
+      ]
+    },
+    "cacheHints": {
+      "refreshCadenceSec": 60,
+      "lkgMaxAgeSec": 900
+    },
+    "entries": [
+      {
+        "host": "jdwt.fun",
+        "enabled": true,
+        "siteId": "site-jdwt-fun",
+        "cfgTx": "2PZ2YpFCukV7AgPM3J5ZXzT1bVg46K6dG6VDtmHeN-s",
+        "targetType": "tx",
+        "targetTx": "hpYUVhjT-Q24KjGv90qu3pX9f9omFt_0HOqEACIjno0",
+        "pathPrefix": "/",
+        "canonicalHost": "jdwt.fun",
+        "nodePool": "global-web"
+      },
+      {
+        "hosts": ["www.jdwt.fun"],
+        "enabled": true,
+        "siteId": "site-jdwt-fun",
+        "cfgTx": "2PZ2YpFCukV7AgPM3J5ZXzT1bVg46K6dG6VDtmHeN-s",
+        "targetType": "tx",
+        "targetTx": "hpYUVhjT-Q24KjGv90qu3pX9f9omFt_0HOqEACIjno0",
+        "pathPrefix": "/",
+        "canonicalHost": "jdwt.fun",
+        "nodePool": "global-web"
+      }
+    ]
+  }
+}

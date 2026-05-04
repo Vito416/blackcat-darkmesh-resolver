@@ -1,0 +1,16 @@
+{
+  "name": "blackcat-darkmesh-resolver",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build:resolver-bundle": "node scripts/build-ao-bundles.mjs --target resolver",
+    "build:resolver-wasm": "bash scripts/deploy/build_resolver_wasm_docker.sh",
+    "build:hb-addon": "python3 scripts/generate-hb-addon-from-canonical.py",
+    "check:hb-addon-drift": "python3 scripts/generate-hb-addon-from-canonical.py --check",
+    "projection:tool": "python3 scripts/projection-envelope-tool.py",
+    "validate:pack": "node scripts/validate-resolver-pack.js",
+    "test:fixtures": "lua scripts/run-resolver-fixtures.lua",
+    "test:ao": "lua tests/integration/resolver_process_spec.lua",
+    "test:ao:centralized-bundle-writes": "RESOLVER_ALLOW_CENTRALIZED_BUNDLE_WRITES=1 lua tests/integration/resolver_process_spec.lua"
+  }
+}

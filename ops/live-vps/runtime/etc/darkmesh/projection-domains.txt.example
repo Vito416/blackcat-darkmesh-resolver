@@ -1,0 +1,8 @@
+# DarkMesh host-routing projection domain list.
+# One domain per line. Lines starting with # are ignored.
+# If `DARKMESH_DM1_INCLUDE_WWW=1` is enabled, the builder also emits
+# `www.<domain>` aliases automatically, so you only list canonical roots here.
+
+jdwt.fun
+vddl.fun
+blgateway.fun
