@@ -28,6 +28,12 @@ Why `GET /resolver/projection/current` stays public:
 - the artifact is signed
 - the artifact does not contain private secret material
 
+Naming note:
+
+- `current` here means the current active shared signed snapshot
+- it is not a claim that only one site can be served at a time
+- we still keep that exact live path for now to avoid widening public surface
+
 ### Operator-only by default
 
 These should be treated as private/operator surfaces:

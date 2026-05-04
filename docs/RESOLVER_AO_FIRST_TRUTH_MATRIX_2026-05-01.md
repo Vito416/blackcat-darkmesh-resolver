@@ -93,7 +93,7 @@ Not allowed:
 Allowed:
 
 - sign AO-derived projection artifacts
-- publish current signed projection
+- publish current active shared signed projection
 - expose authenticated control-plane summaries
 - help operators run release/refresh workflows
 

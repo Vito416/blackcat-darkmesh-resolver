@@ -104,7 +104,7 @@ Both are needed.
 
 Today we are still partly here:
 
-- worker hosts current signed projection
+- worker hosts current active shared signed projection
 - joined node verifies signature/freshness
 - full AO-side revalidation at activation is not finished yet
 

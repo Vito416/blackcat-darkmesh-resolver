@@ -18,7 +18,8 @@ The joining operator has:
 - a running stock HyperBEAM node,
 - nginx in front of it,
 - the DarkMesh Resolver companion pack installed,
-- network access to the current signed projection publication URL,
+- network access to the current active shared signed projection publication
+  URL,
 - the current trust manifest public key(s).
 
 ## Node join checklist
@@ -69,6 +70,14 @@ bash ops/live-vps/local-tools/joined-node-smoke.sh \
 If the control token and explicit private control-state URL are present, the
 smoke check also verifies that the live control-plane AO-native read summary is
 healthy before comparing projection sequence and public behavior.
+
+Naming note:
+
+- `projection/current` here still means the current active shared signed
+  snapshot
+- routine joined-node setup should keep using that live path for now
+- any future `projection/active` support should be treated as optional
+  compatibility work, not a required join-time switch
 
 ## What makes joined nodes equivalent
 

@@ -108,3 +108,11 @@ The current public publication endpoint is:
 The current serving VPS fetches that endpoint via:
 
 - `DARKMESH_PROJECTION_URL=https://blackcat-async-worker.vitek-pasek.workers.dev/resolver/projection/current`
+
+Naming note:
+
+- `projection/current` here means the current active shared signed routing
+  snapshot
+- it stays the live production path for now
+- future alias support should be treated as optional compatibility work, not as
+  a reason to add another live public dependency by default
