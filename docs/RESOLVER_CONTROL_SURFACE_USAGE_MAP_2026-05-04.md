@@ -75,19 +75,39 @@ Important:
 ## Available but currently unused in active operator tooling
 
 These endpoints still exist in the worker surface, but current resolver repo
-tooling does not depend on them:
+tooling does not depend on them for normal release/guard/smoke behavior.
+
+### Keep dormant for ad-hoc introspection
 
 - `GET /resolver/control/capabilities`
 - `GET /resolver/control/status`
 - `GET /resolver/control/publication/current`
+
+Why these are different:
+
+- they are introspection-only
+- they do not add new operator authority
+- they can still be handy for one-off debugging if we explicitly choose to use
+  them
+
+### Best candidates to retire from normal active use first
+
 - `GET /resolver/control/admission-summary`
 - `GET /resolver/control/due-hosts-summary`
 - `GET /resolver/control/dns-refresh-summary`
 
+Why these are the first retirement candidates:
+
+- they are thin convenience slices of the already-published control state
+- current operator flow can already inspect the same information through
+  `state/current` when needed
+- they increase surface area without being required for serving health or
+  current operator automation
+
 Current evidence:
 
 - they are documented in `docs/RESOLVER_CONTROL_PLANE_SURFACE_2026-04-30.md`
-- but there are no active helper scripts in this repo that require them for
+- there are no active helper scripts in this repo that require them for
   normal release/guard/smoke behavior
 
 ## Live VPS/operator config findings
@@ -128,15 +148,16 @@ So hosted automation is no longer a standing public dependency either.
 
 ### Good candidates to retire from normal active use
 
-- `GET /resolver/control/capabilities`
-- `GET /resolver/control/status`
-- `GET /resolver/control/publication/current`
 - `GET /resolver/control/admission-summary`
 - `GET /resolver/control/due-hosts-summary`
 - `GET /resolver/control/dns-refresh-summary`
 
-Not because they are broken, but because current practical operator flow does
-not need them to stay healthy.
+The first three introspection endpoints are fine to leave dormant for now.
+
+The three per-summary endpoints above are the stronger retirement candidates,
+not because they are broken, but because current practical operator flow does
+not need them to stay healthy and `state/current` already covers the same
+material.
 
 ## Safe next live stance
 
@@ -145,5 +166,6 @@ For now, the safe operational posture is:
 1. keep public projection distribution
 2. run release/guard/smoke from Tailscale/operator hosts
 3. treat `resolver/control/*` as optional helper surface
-4. only later decide whether some of those helper endpoints should disappear
-   from normal active use entirely
+4. keep `capabilities`, `status`, and `publication/current` dormant only for
+   ad-hoc inspection
+5. retire the per-summary helper endpoints from normal active use first

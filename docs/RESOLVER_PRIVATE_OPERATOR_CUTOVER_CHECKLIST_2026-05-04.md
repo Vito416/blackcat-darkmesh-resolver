@@ -98,6 +98,20 @@ The current concrete usage classification is captured in:
 
 - `docs/RESOLVER_CONTROL_SURFACE_USAGE_MAP_2026-05-04.md`
 
+Recommended retirement order:
+
+1. stop normal use of:
+   - `GET /resolver/control/admission-summary`
+   - `GET /resolver/control/due-hosts-summary`
+   - `GET /resolver/control/dns-refresh-summary`
+2. keep these only as dormant ad-hoc introspection tools:
+   - `GET /resolver/control/capabilities`
+   - `GET /resolver/control/status`
+   - `GET /resolver/control/publication/current`
+3. keep active operator usage limited to:
+   - `POST /resolver/control/state/publish`
+   - optional explicit `GET /resolver/control/state/current`
+
 That gives us a safer intermediate posture:
 
 - public distribution remains available
