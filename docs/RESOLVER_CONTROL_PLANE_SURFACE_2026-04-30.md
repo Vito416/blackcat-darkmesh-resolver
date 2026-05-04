@@ -45,6 +45,29 @@ These are intentionally separate from:
 - `GET /resolver/projection/current` (public signed artifact fetch)
 - public resolver alias read endpoints on serving nodes
 
+## Minimal exposed surface profile
+
+For the current smaller-operator deployment model, the preferred split is:
+
+- public:
+  - `GET /resolver/projection/current`
+  - joined-node serving/read surfaces that must answer user traffic
+- operator-only:
+  - projection release helpers
+  - joined-node smoke in admin mode
+  - control-state publish
+  - AO readback probes
+  - any `resolver/control/*` endpoint usage
+
+That means `resolver/control/*` should be treated as an operator convenience
+surface, not as something we rely on for permanent public automation.
+
+In practice this also means:
+
+- GitHub-hosted scheduled automation is intentionally disabled
+- Tailscale/local operator execution is preferred for release/guard/smoke flows
+- public exposure should be justified only by joined-node distribution needs
+
 ## Why this is the right boundary
 
 Pros of this split:

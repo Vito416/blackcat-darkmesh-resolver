@@ -1,8 +1,6 @@
 name: Resolver Projection Guard
 
 on:
-  schedule:
-    - cron: "*/30 * * * *"
   workflow_dispatch:
     inputs:
       force:

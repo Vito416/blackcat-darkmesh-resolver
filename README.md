@@ -283,13 +283,15 @@ When `RESOLVER_CONTROL_AUTH_TOKEN` is present, the guard also reads
 decision (`aoReadHealthy`, `aoReadPayloadAvailable`,
 `aoReadRuntimeEffectOnlyActions`).
 
-There is also a scheduled CI workflow for that guard:
+There is also an optional GitHub workflow for that guard:
 
 - `.github/workflows/resolver-projection-guard.yml`
 - configure GitHub secrets:
   - `RESOLVER_SIGNER_AUTH_TOKEN`
   - `RESOLVER_PUBLISH_AUTH_TOKEN`
   - `RESOLVER_CONTROL_AUTH_TOKEN`
+- it is intentionally `workflow_dispatch`-only in the minimal-exposed-surface
+  profile
 - details in `docs/RESOLVER_CONTROL_PLANE_GUARD_AUTOMATION_2026-05-01.md`
 
 Smoke-check a joined serving node:
@@ -526,6 +528,7 @@ The target reply-message payload shape is documented in:
 
 - `docs/RESOLVER_REPLY_MESSAGE_READ_CONTRACT_2026-05-04.md`
 - `docs/RESOLVER_AO_RUNTIME_CARRIER_FINDINGS_2026-05-04.md`
+- `docs/RESOLVER_MINIMAL_EXPOSED_SURFACE_2026-05-04.md`
 
 If a module is finalized on Arweave but the fresh PID still fails with
 `Gateway returned no transaction`, watch GraphQL visibility explicitly:

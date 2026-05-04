@@ -25,16 +25,16 @@ It:
 4. skips publish if current snapshot is still healthy
 5. otherwise runs `projection-release.sh`
 
-### 2) Scheduled CI workflow
+### 2) Optional GitHub workflow
 
 - `.github/workflows/resolver-projection-guard.yml`
 
-It runs the guard:
+It can run the guard on manual `workflow_dispatch` and upload the
+decision/release artifacts as a workflow artifact.
 
-- every 30 minutes
-- or on manual `workflow_dispatch`
-
-and uploads the decision/release artifacts as a workflow artifact.
+In the current minimal-exposed-surface profile we intentionally do **not** keep
+this workflow on a public schedule. If we want unattended runs later, that
+should come back only behind an operator path we are comfortable exposing.
 
 ## Required GitHub secrets
 
@@ -47,8 +47,8 @@ The workflow expects:
 These are the same control-plane tokens already used by the local release flow.
 
 The script itself still keeps the control token optional for manual operator
-use, but the scheduled GitHub workflow now requires it so AO-native health is
-always part of automated guard decisions.
+use, but the GitHub workflow requires it so AO-native health is always part of
+manual workflow runs too.
 
 ## Current default automation values
 
@@ -115,7 +115,9 @@ This is a safe intermediate layer because:
 
 ### Normal operation
 
-Let the scheduled workflow run and refresh the projection only when needed.
+Run the guard from a Tailscale-reachable operator host, or invoke the GitHub
+workflow manually only when you explicitly want the hosted runner to do that
+work.
 
 ### Manual check
 
