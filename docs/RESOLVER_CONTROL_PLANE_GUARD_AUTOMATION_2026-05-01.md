@@ -29,6 +29,11 @@ In the current minimal-exposed-surface profile, that AO health fetch is
 explicit: pass `--control-state-url` when you really want it, instead of
 silently deriving a public `resolver/control/*` URL from the worker base.
 
+In practice that means the intended shape is:
+
+- public distribution path for the projection artifact
+- explicit private/operator URL for `resolver/control/state/current`
+
 ### 2) Optional GitHub workflow
 
 - `.github/workflows/resolver-projection-guard.yml`
@@ -53,6 +58,10 @@ These are the same control-plane tokens already used by the local release flow.
 The script itself still keeps the control token optional for manual operator
 use, but the GitHub workflow requires it so AO-native health is always part of
 manual workflow runs too.
+
+That does **not** mean routine public automation should depend on
+`resolver/control/*`; it only means a manually triggered operator workflow can
+carry the extra AO health context when we explicitly choose that private path.
 
 ## Current default automation values
 

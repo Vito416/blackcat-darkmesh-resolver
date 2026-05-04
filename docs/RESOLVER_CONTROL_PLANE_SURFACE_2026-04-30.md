@@ -40,6 +40,15 @@ Current authenticated worker endpoints:
 - `GET /resolver/control/due-hosts-summary`
 - `GET /resolver/control/dns-refresh-summary`
 
+Current usage stance:
+
+- `POST /resolver/control/state/publish` and explicit `GET /resolver/control/state/current`
+  are the only helper paths we still treat as active operator surfaces
+- `GET /resolver/control/capabilities`, `GET /resolver/control/status`, and
+  `GET /resolver/control/publication/current` are dormant debug helpers
+- per-summary convenience endpoints are first retirement candidates from normal
+  operator flow
+
 These are intentionally separate from:
 
 - `GET /resolver/projection/current` (public signed artifact fetch)

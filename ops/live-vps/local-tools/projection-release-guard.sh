@@ -18,7 +18,7 @@ Examples:
   projection-release-guard.sh \
     --domains jdwt.fun,vddl.fun,blgateway.fun \
     --worker-base-url https://blackcat-async-worker.example.workers.dev \
-    --control-state-url https://blackcat-async-worker.example.workers.dev/resolver/control/state/current \
+    --control-state-url https://<private-control-surface>/resolver/control/state/current \
     --verify-node-state-url https://hyperbeam.darkmesh.fun/~darkmesh-resolver@1.0/GetResolverState \
     --min-valid-sec 1800 \
     --release-ttl-sec 86400
