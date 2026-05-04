@@ -535,6 +535,7 @@ The target reply-message payload shape is documented in:
 - `docs/RESOLVER_AO_RUNTIME_CARRIER_FINDINGS_2026-05-04.md`
 - `docs/RESOLVER_MINIMAL_EXPOSED_SURFACE_2026-05-04.md`
 - `docs/RESOLVER_PRIVATE_OPERATOR_CUTOVER_CHECKLIST_2026-05-04.md`
+- `docs/RESOLVER_CONTROL_SURFACE_USAGE_MAP_2026-05-04.md`
 
 If a module is finalized on Arweave but the fresh PID still fails with
 `Gateway returned no transaction`, watch GraphQL visibility explicitly:

@@ -94,6 +94,10 @@ Current recommendation:
 - keep them as helper/operator surfaces for now
 - but stop treating them as always-on public automation inputs
 
+The current concrete usage classification is captured in:
+
+- `docs/RESOLVER_CONTROL_SURFACE_USAGE_MAP_2026-05-04.md`
+
 That gives us a safer intermediate posture:
 
 - public distribution remains available
