@@ -74,6 +74,32 @@ Another scope decision is now explicit too:
 - resolver-side pool awareness is an optional later phase, not a required
   immediate dependency for multi-node rollout.
 
+## Status snapshot
+
+### Working today
+
+- shared signed projection publication is live
+- joined-node verify-only activation is live
+- nginx `map`-based host routing is live
+- minimal exposed surface posture is documented and reflected in current
+  operator tooling defaults
+- AO-native read health is surfaced into control-state as a first-class
+  operator signal
+
+### Still transitional
+
+- the public alias path still depends on the projection-backed read adapter
+- AO runtime readback is still practically `runtime_effect_only`, not rich
+  semantic payload delivery
+- worker control helpers still exist as operator convenience surfaces, even
+  though normal flow is being narrowed
+
+### Next real technical goals
+
+- reduce reliance on the projection-backed read adapter
+- keep moving joined-node activation toward stronger AO-derived parity checks
+- improve AO-native read contracts without widening public surface
+
 ## Replication model
 
 The important serving model is now:
