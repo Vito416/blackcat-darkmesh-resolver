@@ -27,7 +27,7 @@ Verifies that a joined serving node:
 Options:
   --worker-current-url <url>   Current signed snapshot URL.
   --control-state-url <url>    Optional authenticated control-state current URL.
-                               Default: <worker-current base>/resolver/control/state/current
+                               No default in minimal-exposed-surface mode.
   --control-auth-token <tok>   Optional bearer token for control-state fetch.
   --node-state-url <url>       Joined node GetResolverState URL.
   --node-read-base-url <url>   Joined node resolver read base URL.
@@ -76,13 +76,6 @@ require_cmd() {
 
 require_cmd curl
 require_cmd jq
-
-if [[ -z "$CONTROL_STATE_URL" ]]; then
-  control_state_base="${WORKER_CURRENT_URL%/resolver/projection/current}"
-  if [[ "$control_state_base" != "$WORKER_CURRENT_URL" ]]; then
-    CONTROL_STATE_URL="${control_state_base}/resolver/control/state/current"
-  fi
-fi
 
 fetch_json() {
   local url="$1"
@@ -155,6 +148,8 @@ if [[ -n "$CONTROL_STATE_URL" && -n "$CONTROL_AUTH_TOKEN" ]]; then
   echo "  aoReadProcessId=${ao_read_process_id:-unknown}"
   echo "  aoReadPayloadActions=${ao_read_payload_available}"
   echo "  aoReadRuntimeEffectOnlyActions=${ao_read_runtime_effect_only}"
+elif [[ -n "$CONTROL_AUTH_TOKEN" ]]; then
+  echo "[1.5/4] Skip control-plane AO health summary (no --control-state-url provided)"
 fi
 
 echo "[2/4] Fetch joined node resolver state"

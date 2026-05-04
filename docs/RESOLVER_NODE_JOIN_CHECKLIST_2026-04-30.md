@@ -61,13 +61,14 @@ export RESOLVER_CONTROL_AUTH_TOKEN=...
 
 bash ops/live-vps/local-tools/joined-node-smoke.sh \
   --worker-current-url https://blackcat-async-worker.vitek-pasek.workers.dev/resolver/projection/current \
+  --control-state-url https://<private-control-surface>/resolver/control/state/current \
   --node-state-url https://hyperbeam.darkmesh.fun/~darkmesh-resolver@1.0/GetResolverState \
   --node-read-base-url https://hyperbeam.darkmesh.fun
 ```
 
-If the control token is present, the smoke check also verifies that the live
-control-plane AO-native read summary is healthy before comparing projection
-sequence and public behavior.
+If the control token and explicit private control-state URL are present, the
+smoke check also verifies that the live control-plane AO-native read summary is
+healthy before comparing projection sequence and public behavior.
 
 ## What makes joined nodes equivalent
 

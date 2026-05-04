@@ -33,7 +33,7 @@ Options:
   --domains-file <path>         One domain per line.
   --worker-base-url <url>       Async worker base URL.
   --control-state-url <url>     Optional authenticated control-state current URL.
-                                Default: <worker-base-url>/resolver/control/state/current
+                                No default in minimal-exposed-surface mode.
   --control-auth-token <token>  Optional bearer token for control-state fetch.
   --min-valid-sec <n>           Minimum remaining validity required to skip release.
                                 Default: 1800
@@ -105,10 +105,6 @@ bash -n "$RELEASE_SCRIPT" >/dev/null
   echo "--worker-base-url or DARKMESH_ASYNC_WORKER_BASE_URL is required" >&2
   exit 2
 }
-
-if [[ -z "$CONTROL_STATE_URL" ]]; then
-  CONTROL_STATE_URL="${WORKER_BASE_URL%/}/resolver/control/state/current"
-fi
 
 if [[ -z "$DOMAINS_CSV" && -z "$DOMAINS_FILE" && "${#POSITIONAL_DOMAINS[@]}" -eq 0 ]]; then
   echo "provide domains via --domains, --domains-file, or positional args" >&2
@@ -192,7 +188,7 @@ PY
   fi
 fi
 
-if [[ -n "$CONTROL_AUTH_TOKEN" ]]; then
+if [[ -n "$CONTROL_AUTH_TOKEN" && -n "$CONTROL_STATE_URL" ]]; then
   control_state_http_code="$(curl -sS -o "$CONTROL_STATE_PATH" -w '%{http_code}' -H "authorization: Bearer ${CONTROL_AUTH_TOKEN}" "$CONTROL_STATE_URL" || true)"
   if [[ "$control_state_http_code" == "200" ]]; then
     control_state_fetched=true
@@ -213,6 +209,8 @@ if [[ -n "$CONTROL_AUTH_TOKEN" ]]; then
   else
     control_state_detail="http_${control_state_http_code}"
   fi
+elif [[ -n "$CONTROL_AUTH_TOKEN" ]]; then
+  control_state_detail="skipped_no_control_state_url"
 fi
 
 if (( FORCE == 1 )); then

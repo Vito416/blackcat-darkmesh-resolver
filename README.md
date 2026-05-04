@@ -273,15 +273,18 @@ export RESOLVER_CONTROL_AUTH_TOKEN=...
 bash ops/live-vps/local-tools/projection-release-guard.sh \
   --domains jdwt.fun,vddl.fun,blgateway.fun \
   --worker-base-url https://blackcat-async-worker.vitek-pasek.workers.dev \
+  --control-state-url https://<private-control-surface>/resolver/control/state/current \
   --verify-node-state-url https://hyperbeam.darkmesh.fun/~darkmesh-resolver@1.0/GetResolverState \
   --min-valid-sec 1800 \
   --release-ttl-sec 86400
 ```
 
-When `RESOLVER_CONTROL_AUTH_TOKEN` is present, the guard also reads
-`/resolver/control/state/current` and records AO-native health in the guard
-decision (`aoReadHealthy`, `aoReadPayloadAvailable`,
-`aoReadRuntimeEffectOnlyActions`).
+When `RESOLVER_CONTROL_AUTH_TOKEN` and an explicit `--control-state-url` are
+present, the guard also reads control-plane AO health and records
+`aoReadHealthy`, `aoReadPayloadAvailable`, and
+`aoReadRuntimeEffectOnlyActions` in the decision output. In the
+minimal-exposed-surface profile this is explicit on purpose, so the script does
+not silently fall back to public `resolver/control/*`.
 
 There is also an optional GitHub workflow for that guard:
 
@@ -301,6 +304,7 @@ export RESOLVER_CONTROL_AUTH_TOKEN=...
 
 bash ops/live-vps/local-tools/joined-node-smoke.sh \
   --worker-current-url https://blackcat-async-worker.vitek-pasek.workers.dev/resolver/projection/current \
+  --control-state-url https://<private-control-surface>/resolver/control/state/current \
   --node-state-url https://hyperbeam.darkmesh.fun/~darkmesh-resolver@1.0/GetResolverState \
   --node-read-base-url https://hyperbeam.darkmesh.fun \
   --public-url https://jdwt.fun/ \
@@ -310,8 +314,9 @@ bash ops/live-vps/local-tools/joined-node-smoke.sh \
   --write-guard-url https://write.darkmesh.fun/push
 ```
 
-When the control token is present, joined-node smoke also checks the live
-control-plane AO health summary before it compares projection state.
+When the control token and an explicit control-state URL are present,
+joined-node smoke also checks the live control-plane AO health summary before
+it compares projection state.
 
 Scout current D2 readiness without mutating production:
 
@@ -529,6 +534,7 @@ The target reply-message payload shape is documented in:
 - `docs/RESOLVER_REPLY_MESSAGE_READ_CONTRACT_2026-05-04.md`
 - `docs/RESOLVER_AO_RUNTIME_CARRIER_FINDINGS_2026-05-04.md`
 - `docs/RESOLVER_MINIMAL_EXPOSED_SURFACE_2026-05-04.md`
+- `docs/RESOLVER_PRIVATE_OPERATOR_CUTOVER_CHECKLIST_2026-05-04.md`
 
 If a module is finalized on Arweave but the fresh PID still fails with
 `Gateway returned no transaction`, watch GraphQL visibility explicitly:

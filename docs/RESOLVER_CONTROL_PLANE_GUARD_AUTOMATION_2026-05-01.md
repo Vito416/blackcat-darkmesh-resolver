@@ -25,6 +25,10 @@ It:
 4. skips publish if current snapshot is still healthy
 5. otherwise runs `projection-release.sh`
 
+In the current minimal-exposed-surface profile, that AO health fetch is
+explicit: pass `--control-state-url` when you really want it, instead of
+silently deriving a public `resolver/control/*` URL from the worker base.
+
 ### 2) Optional GitHub workflow
 
 - `.github/workflows/resolver-projection-guard.yml`

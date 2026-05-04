@@ -90,3 +90,7 @@ If we want to tighten further after this:
 1. stop relying on public `resolver/control/*` even for convenience
 2. collapse operator reads back into Tailscale/local execution paths
 3. leave the public worker surface with only signed projection distribution
+
+The concrete near-term operator checklist for that is:
+
+- `docs/RESOLVER_PRIVATE_OPERATOR_CUTOVER_CHECKLIST_2026-05-04.md`
