@@ -189,6 +189,9 @@ Naming note:
 - if we rename the public distribution path later, `projection/active` is the
   clearest future alias; `projection/current` should then remain as a
   compatibility path
+- in the current minimal-surface posture we are **not** adding that live alias
+  yet; `projection/active` stays a documented future option, not a new active
+  public endpoint
 
 For the longer operator cutover rationale and day-to-day checklist, see:
 
@@ -362,6 +365,8 @@ Alias-readiness note:
 - `projection-release.sh` and `projection-release-guard.sh` now also accept
   `--projection-path`, so we can move to `/resolver/projection/active` later
   without rewriting the scripts themselves
+- that does **not** mean we should switch live defaults now; routine operator
+  use should still stay on `/resolver/projection/current`
 
 Scout current D2 readiness without mutating production:
 

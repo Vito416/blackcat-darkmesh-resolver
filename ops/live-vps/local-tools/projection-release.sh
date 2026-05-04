@@ -36,6 +36,8 @@ Useful options:
   --worker-base-url <url>      Async worker base URL.
   --projection-path <path>     Projection fetch path for verification.
                                Default: /resolver/projection/current
+                               Keep the default for routine live use unless
+                               you intentionally introduce a compatibility alias.
   --sequence <n|auto>          Projection sequence. Default: auto
   --ttl-sec <n>                Projection TTL / expiresAt horizon. Passed to builder.
   --refresh-cadence-sec <n>    cacheHints.refreshCadenceSec. Passed to builder.

@@ -34,6 +34,8 @@ Options:
   --worker-base-url <url>       Async worker base URL.
   --projection-path <path>      Projection fetch path for active snapshot checks.
                                 Default: /resolver/projection/current
+                                Keep the default for routine live use unless
+                                you intentionally introduce a compatibility alias.
   --control-state-url <url>     Optional authenticated control-state current URL.
                                 No default in minimal-exposed-surface mode.
   --control-auth-token <token>  Optional bearer token for control-state fetch.

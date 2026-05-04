@@ -1,7 +1,7 @@
 # Resolver projection active alias plan
 
 Date: 2026-05-04
-Status: planned compatibility cleanup
+Status: planned compatibility cleanup, not live cutover
 
 ## Why this exists
 
@@ -22,6 +22,8 @@ It means:
 
 The intent of this note is to make the naming cleanup explicit without creating
 an unnecessary breaking change.
+
+It is also explicitly **not** a request to widen the live public surface today.
 
 ## Proposed naming model
 
@@ -74,6 +76,8 @@ At this point:
 
 - no joined-node config has to change immediately
 - no rollback complexity is introduced
+- but only do this if the naming gain is worth carrying one more public read
+  path, even as a 1:1 alias
 
 Tooling is already being prepared for that phase by preferring neutral
 operator flags such as:
@@ -123,3 +127,5 @@ Until the alias is actually implemented:
 - keep using `GET /resolver/projection/current` in live examples
 - describe it explicitly as the current active shared signed snapshot
 - avoid pretending the alias already exists
+- do **not** add `/resolver/projection/active` to live infrastructure by
+  default just because tooling is alias-ready
