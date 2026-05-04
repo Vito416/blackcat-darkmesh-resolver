@@ -161,6 +161,41 @@ The first remote publication endpoint is now:
 
 - `https://blackcat-async-worker.vitek-pasek.workers.dev/resolver/projection/current`
 
+## Minimal surface quick matrix
+
+This is the current small-operator posture at a glance:
+
+- Public keep:
+  - `GET /resolver/projection/current`
+- Operator-only active:
+  - projection release
+  - projection freshness guard
+  - joined-node smoke
+  - `POST /resolver/control/state/publish`
+  - optional explicit `GET /resolver/control/state/current`
+- Operator-only dormant debug helpers:
+  - `GET /resolver/control/capabilities`
+  - `GET /resolver/control/status`
+  - `GET /resolver/control/publication/current`
+- First endpoints to retire from normal day-to-day use:
+  - `GET /resolver/control/admission-summary`
+  - `GET /resolver/control/due-hosts-summary`
+  - `GET /resolver/control/dns-refresh-summary`
+
+Naming note:
+
+- `projection/current` means the current shared active signed routing snapshot
+  for all joined nodes, not "the current page" or "one currently served site"
+- if we rename the public distribution path later, `projection/active` is the
+  clearest future alias; `projection/current` should then remain as a
+  compatibility path
+
+For the longer operator cutover rationale and day-to-day checklist, see:
+
+- `docs/RESOLVER_MINIMAL_EXPOSED_SURFACE_2026-05-04.md`
+- `docs/RESOLVER_CONTROL_SURFACE_USAGE_MAP_2026-05-04.md`
+- `docs/RESOLVER_LIVE_OPERATIONS_MINIMAL_SURFACE_CHECKLIST_2026-05-04.md`
+
 ## Quick commands
 
 Run the fixture pack:

@@ -29,6 +29,13 @@ Why:
 - this is the only worker-side public distribution surface we still clearly
   need right now
 
+Naming note:
+
+- `current` here means the current shared active signed routing snapshot
+- it does **not** mean one current site or one current page
+- if we later tighten naming, `projection/active` is the cleanest compatible
+  future alias
+
 ## Current operator-only helper usage
 
 ### `POST /resolver/control/state/publish`
