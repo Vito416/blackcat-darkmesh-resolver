@@ -195,6 +195,7 @@ For the longer operator cutover rationale and day-to-day checklist, see:
 - `docs/RESOLVER_MINIMAL_EXPOSED_SURFACE_2026-05-04.md`
 - `docs/RESOLVER_CONTROL_SURFACE_USAGE_MAP_2026-05-04.md`
 - `docs/RESOLVER_LIVE_OPERATIONS_MINIMAL_SURFACE_CHECKLIST_2026-05-04.md`
+- `docs/RESOLVER_PROJECTION_ACTIVE_ALIAS_PLAN_2026-05-04.md`
 
 ## Quick commands
 

@@ -35,6 +35,8 @@ Naming note:
 - it does **not** mean one current site or one current page
 - if we later tighten naming, `projection/active` is the cleanest compatible
   future alias
+- the compatibility rollout is captured in
+  `docs/RESOLVER_PROJECTION_ACTIVE_ALIAS_PLAN_2026-05-04.md`
 
 ## Current operator-only helper usage
 
