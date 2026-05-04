@@ -25,7 +25,7 @@ This script is intentionally:
 
 ## What it checks
 
-1. worker current signed snapshot
+1. worker active shared signed snapshot
 2. joined-node resolver state
 3. joined-node DNS refresh state
 4. optional probe status for:
@@ -69,10 +69,18 @@ export RESOLVER_SIGNER_AUTH_TOKEN=...
 
 bash ops/live-vps/local-tools/dynamic-mode-scout.sh \
   --worker-base-url https://blackcat-async-worker.vitek-pasek.workers.dev \
+  --worker-projection-url https://blackcat-async-worker.vitek-pasek.workers.dev/resolver/projection/current \
   --aoconnect-report /tmp/dm-aoconnect-contract-dyi/ao-control-state-aoconnect-report.json \
   --domains jdwt.fun,vddl.fun,blgateway.fun \
   --release-dry-run
 ```
+
+Notes:
+
+- the neutral flag is now `--worker-projection-url`
+- the live default path still stays `GET /resolver/projection/current`
+- we are not adding `/resolver/projection/active` to live infrastructure by
+  default in the current minimal-surface posture
 
 When `--aoconnect-report` is provided, the scout report also carries:
 

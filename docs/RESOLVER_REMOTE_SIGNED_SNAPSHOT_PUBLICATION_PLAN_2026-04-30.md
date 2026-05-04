@@ -12,7 +12,8 @@ Move from:
 to:
 
 - one remote signed snapshot publication target
-- many verify-only serving nodes fetching the same current signed artifact
+- many verify-only serving nodes fetching the same current active shared signed
+  artifact
 
 without weakening the trust boundary.
 
@@ -50,6 +51,13 @@ That keeps the design simple:
 - `GET /resolver/projection/current`
 - public
 - safe because the payload is signed and contains no private signer secret
+
+Naming note:
+
+- `current` here means the current active shared signed routing snapshot
+- it does **not** imply one current site or page
+- any future `projection/active` path should be treated only as a compatibility
+  alias, not as a reason to widen the live public surface by default
 
 ## KV storage model
 
@@ -107,6 +115,12 @@ This phase is now live in the current reference serving-node production shape:
    - `https://blackcat-async-worker.vitek-pasek.workers.dev/resolver/projection/current`
 3. node keeps `DARKMESH_PROJECTION_REQUIRE_SIGNED=1`
 4. node verifies and activates from remote fetch
+
+Current conservative stance:
+
+- keep `projection/current` as the live distribution path
+- treat any future `projection/active` support as optional compatibility work,
+  not a required rollout step
 
 That removes the manual `scp` step without changing the verify-only trust
 boundary.

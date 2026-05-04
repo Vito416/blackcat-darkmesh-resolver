@@ -27,6 +27,13 @@ The current D1 release flow is:
 5. confirm `GET /resolver/projection/current` now serves the new snapshot
 6. optionally confirm joined nodes activated the new sequence
 
+Naming note:
+
+- `projection/current` here means the current active shared signed snapshot
+- routine live releases should keep using that path for now
+- future alias-readiness does not imply a live switch to
+  `projection/active` by default
+
 ## Script
 
 The current wrapper for that flow is:
