@@ -440,7 +440,7 @@ if (( EXECUTE_LIVE == 0 )); then
   exit 0
 fi
 
-REMOTE_TMP="/tmp/resolver-projection-${PUBLISHED_SEQUENCE}-$$.json"
+REMOTE_TMP="resolver-projection-${PUBLISHED_SEQUENCE}-$$.json"
 echo "copying signed projection to $SSH_TARGET..."
 scp "${SCP_ARGS[@]}" "$SIGNED_PATH" "${SSH_TARGET}:${REMOTE_TMP}"
 
