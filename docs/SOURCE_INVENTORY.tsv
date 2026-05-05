@@ -148,3 +148,5 @@ GENERATED_IN_SPLIT_REPO	docs/RESOLVER_COMPLETION_TRACK_2026-05-05.md
 GENERATED_IN_SPLIT_REPO	ops/live-vps/local-tools/audit-resolver-runtime-posture.sh
 GENERATED_IN_SPLIT_REPO	docs/RESOLVER_RUNTIME_POSTURE_AUDIT_WORKFLOW_2026-05-05.md
 GENERATED_IN_SPLIT_REPO	ops/live-vps/local-tools/check-resolver-core-completion.sh
+GENERATED_IN_SPLIT_REPO	ops/live-vps/local-tools/projection-release-private-file.sh
+GENERATED_IN_SPLIT_REPO	docs/RESOLVER_PRIVATE_FILE_RELEASE_WORKFLOW_2026-05-05.md

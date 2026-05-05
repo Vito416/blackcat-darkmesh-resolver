@@ -346,6 +346,30 @@ bash ops/live-vps/local-tools/bootstrap-async-worker-signer.sh \
   --worker-dir ../blackcat-darkmesh-gateway/workers/async-worker
 ```
 
+Preferred minimal-surface operator release path:
+
+```bash
+bash ops/live-vps/local-tools/projection-release-private-file.sh \
+  --domains jdwt.fun,vddl.fun,blgateway.fun \
+  --execute-live 1 \
+  --ssh-target adminops@100.104.75.121 \
+  --ssh-key ~/.ssh/darkmesh_new_vps_adminops \
+  --switch-node-to-file-url 1 \
+  --verify-node-state-url https://hyperbeam.darkmesh.fun/~darkmesh-resolver@1.0/GetResolverState
+```
+
+That path:
+
+- signs locally with `~/.config/darkmesh/projection-signer-2026-q2`
+- copies the signed artifact to the joined node over Tailscale/private SSH
+- can flip the joined node into `file://` verify-only mode
+- does **not** require `RESOLVER_*_AUTH_TOKEN`
+
+The older async-worker bearer-token release path remains available as a
+compatibility helper, but it is no longer the preferred operator default in the
+minimal-exposed-surface model. Details:
+`docs/RESOLVER_PRIVATE_FILE_RELEASE_WORKFLOW_2026-05-05.md`.
+
 Publish a signed projection through the async worker:
 
 ```bash
