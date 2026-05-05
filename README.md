@@ -100,6 +100,35 @@ Another scope decision is now explicit too:
 - keep moving joined-node activation toward stronger AO-derived parity checks
 - improve AO-native read contracts without widening public surface
 
+## Known limitations
+
+- the public resolver alias still uses the projection-backed adapter instead of
+  a fully AO-native serving path
+- AO runtime reads are still healthiest at the `runtime_effect_only` contract
+  level; rich semantic payload delivery is not yet a safe default assumption
+- worker-side control helpers are still present as operator convenience tools,
+  even though we are actively narrowing normal flow away from them
+- tenant onboarding modes are not yet packaged as a finished operator-facing
+  resolver product; that is the next completion phase
+
+## Completion track
+
+Before we shift focus to tenant onboarding, the practical "complete resolver"
+target is:
+
+- stable shared signed projection distribution and joined-node activation
+- stronger AO-derived parity checks at activation time
+- clear AO-native read contract expectations for operator health and debugging
+- minimal-exposed-surface operator flow as the default posture
+- one explicit onboarding story for:
+  - static tx-backed sites
+  - static AO process-backed sites
+  - dynamic AO-backed sites
+
+That completion plan is tracked in:
+
+- `docs/RESOLVER_COMPLETION_TRACK_2026-05-05.md`
+
 ## Replication model
 
 The important serving model is now:

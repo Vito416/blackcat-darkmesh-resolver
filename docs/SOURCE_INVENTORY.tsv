@@ -144,3 +144,4 @@ GENERATED_IN_SPLIT_REPO	ops/live-vps/runtime/scripts/darkmesh-graphql-shim.py
 GENERATED_IN_SPLIT_REPO	ops/live-vps/local-tools/update-graphql-shim-allowlist.sh
 GENERATED_IN_SPLIT_REPO	ops/live-vps/local-tools/resolver-lab-cycle.sh
 GENERATED_IN_SPLIT_REPO	docs/RESOLVER_PROJECTION_ACTIVE_ALIAS_PLAN_2026-05-04.md
+GENERATED_IN_SPLIT_REPO	docs/RESOLVER_COMPLETION_TRACK_2026-05-05.md
