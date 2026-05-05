@@ -128,6 +128,7 @@ target is:
 That completion plan is tracked in:
 
 - `docs/RESOLVER_COMPLETION_TRACK_2026-05-05.md`
+- `docs/RESOLVER_RUNTIME_POSTURE_AUDIT_WORKFLOW_2026-05-05.md`
 
 ## Replication model
 
@@ -279,6 +280,13 @@ Validate the resolver pack:
 
 ```bash
 node scripts/validate-resolver-pack.js
+```
+
+Audit current runtime posture (adapter vs parity vs signed-only):
+
+```bash
+bash ops/live-vps/local-tools/audit-resolver-runtime-posture.sh \
+  --output /tmp/resolver-runtime-posture.json
 ```
 
 Use the signed projection helper:

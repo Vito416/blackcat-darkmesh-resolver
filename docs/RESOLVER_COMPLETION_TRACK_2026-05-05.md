@@ -160,3 +160,9 @@ The next best technical direction is still resolver-core work, not onboarding:
    adapter
 2. continue strengthening node-side AO-derived verification logic
 3. avoid widening public surface while doing it
+
+Useful companion tool while doing that:
+
+- `ops/live-vps/local-tools/audit-resolver-runtime-posture.sh`
+- workflow note:
+  `docs/RESOLVER_RUNTIME_POSTURE_AUDIT_WORKFLOW_2026-05-05.md`
