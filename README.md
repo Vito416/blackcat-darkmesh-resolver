@@ -286,6 +286,7 @@ Audit current runtime posture (adapter vs parity vs signed-only):
 
 ```bash
 bash ops/live-vps/local-tools/audit-resolver-runtime-posture.sh \
+  --sudo \
   --output /tmp/resolver-runtime-posture.json
 ```
 
@@ -294,6 +295,7 @@ Check resolver-core completion posture:
 ```bash
 bash ops/live-vps/local-tools/check-resolver-core-completion.sh \
   --profile pre-onboarding-complete \
+  --sudo \
   --output /tmp/resolver-core-completion.json
 ```
 

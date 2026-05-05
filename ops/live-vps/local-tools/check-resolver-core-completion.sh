@@ -28,6 +28,7 @@ Options:
   --env-file <path>        Forwarded to audit helper.
   --state-file <path>      Forwarded to audit helper.
   --output <path>          Optional JSON output path.
+  --sudo                   Forwarded to audit helper for root-owned node files.
   --skip-systemctl         Forwarded to audit helper.
   -h, --help               Show help.
 USAGE
@@ -41,6 +42,7 @@ AUDIT_JSON=""
 ENV_FILE=""
 STATE_FILE=""
 OUTPUT_PATH=""
+USE_SUDO=0
 SKIP_SYSTEMCTL=0
 
 while [[ $# -gt 0 ]]; do
@@ -50,6 +52,7 @@ while [[ $# -gt 0 ]]; do
     --env-file) ENV_FILE="${2:-}"; shift 2 ;;
     --state-file) STATE_FILE="${2:-}"; shift 2 ;;
     --output) OUTPUT_PATH="${2:-}"; shift 2 ;;
+    --sudo) USE_SUDO=1; shift ;;
     --skip-systemctl) SKIP_SYSTEMCTL=1; shift ;;
     -h|--help) usage; exit 0 ;;
     *) echo "Unknown option: $1" >&2; usage; exit 2 ;;
@@ -86,6 +89,7 @@ if [[ -z "$audit_path" ]]; then
   audit_args=(--output "$audit_path")
   [[ -n "$ENV_FILE" ]] && audit_args+=(--env-file "$ENV_FILE")
   [[ -n "$STATE_FILE" ]] && audit_args+=(--state-file "$STATE_FILE")
+  (( USE_SUDO == 1 )) && audit_args+=(--sudo)
   (( SKIP_SYSTEMCTL == 1 )) && audit_args+=(--skip-systemctl)
   bash "$AUDIT_SCRIPT" "${audit_args[@]}" >/dev/null
 fi
@@ -108,8 +112,11 @@ jq -e '
 readarray -t base_failures < <(
   jq -r '
     [
+      (if (.projection.envReadable // false) != true then "projection_env_unreadable" else empty end),
+      (if (.state.readable // false) != true then "projection_state_unreadable" else empty end),
       (if (.projection.url // null) == null then "projection_url_missing" else empty end),
       (if (.projection.requireSigned // false) != true then "signed_projection_not_required" else empty end),
+      (if ((.state.mode // "") != "active" and (.state.mode // "") != "stale_lkg" and (.state.mode // "") != "lkg") then "runtime_state_not_active" else empty end),
       (if (.services.syncTimer.enabled // "") != "enabled" then "sync_timer_not_enabled" else empty end),
       (if ((.services.syncTimer.active // "") != "active" and (.services.syncTimer.active // "") != "activating") then "sync_timer_not_active" else empty end)
     ] | .[]

@@ -39,6 +39,11 @@ answer for resolver-core completion profiles.
   - `darkmesh-host-routing-sync.service`
   - `darkmesh-host-routing-sync.timer`
 
+Important:
+
+- on a real node these files are often root-owned
+- use `--sudo` when running over an operator account such as `adminops`
+
 ## What it reports
 
 ### Projection posture
@@ -82,6 +87,7 @@ On a real node:
 
 ```bash
 bash ops/live-vps/local-tools/audit-resolver-runtime-posture.sh \
+  --sudo \
   --output /tmp/resolver-runtime-posture.json
 ```
 
@@ -99,12 +105,14 @@ Completion gate examples:
 ```bash
 bash ops/live-vps/local-tools/check-resolver-core-completion.sh \
   --profile production-stable \
+  --sudo \
   --output /tmp/resolver-core-completion.production.json
 ```
 
 ```bash
 bash ops/live-vps/local-tools/check-resolver-core-completion.sh \
   --profile pre-onboarding-complete \
+  --sudo \
   --output /tmp/resolver-core-completion.pre-onboarding.json
 ```
 

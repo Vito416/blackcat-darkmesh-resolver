@@ -27,6 +27,7 @@ Options:
   --state-file <path>       Host-routing state file.
                             Default: /var/lib/darkmesh/host-routing/state.json
   --output <path>           Optional JSON output path.
+  --sudo                    Read env/state via sudo for root-owned node files.
   --skip-systemctl          Do not query systemctl states.
   -h, --help                Show help.
 USAGE
@@ -35,6 +36,7 @@ USAGE
 ENV_FILE="/etc/darkmesh/resolver-projection.env"
 STATE_FILE="/var/lib/darkmesh/host-routing/state.json"
 OUTPUT_PATH=""
+USE_SUDO=0
 SKIP_SYSTEMCTL=0
 
 while [[ $# -gt 0 ]]; do
@@ -42,6 +44,7 @@ while [[ $# -gt 0 ]]; do
     --env-file) ENV_FILE="${2:-}"; shift 2 ;;
     --state-file) STATE_FILE="${2:-}"; shift 2 ;;
     --output) OUTPUT_PATH="${2:-}"; shift 2 ;;
+    --sudo) USE_SUDO=1; shift ;;
     --skip-systemctl) SKIP_SYSTEMCTL=1; shift ;;
     -h|--help) usage; exit 0 ;;
     *) echo "Unknown option: $1" >&2; usage; exit 2 ;;
@@ -57,15 +60,37 @@ require_cmd() {
 
 require_cmd jq
 
+maybe_sudo() {
+  if (( USE_SUDO == 1 )); then
+    sudo "$@"
+  else
+    "$@"
+  fi
+}
+
+can_read_path() {
+  local path="$1"
+  if (( USE_SUDO == 1 )); then
+    sudo test -r "$path"
+  else
+    test -r "$path"
+  fi
+}
+
 read_env_value() {
   local key="$1"
   local default="${2:-}"
-  if [[ ! -f "$ENV_FILE" ]]; then
+  if (( USE_SUDO == 1 )); then
+    if ! sudo test -f "$ENV_FILE"; then
+      printf '%s' "$default"
+      return 0
+    fi
+  elif [[ ! -f "$ENV_FILE" ]]; then
     printf '%s' "$default"
     return 0
   fi
 
-  awk -v key="$key" -v def="$default" '
+  maybe_sudo awk -v key="$key" -v def="$default" '
     BEGIN {
       found = 0
       value = def
@@ -110,11 +135,16 @@ json_string_or_null() {
 
 read_state_field_raw() {
   local expr="$1"
-  if [[ ! -f "$STATE_FILE" ]]; then
+  if (( USE_SUDO == 1 )); then
+    if ! sudo test -f "$STATE_FILE"; then
+      printf ''
+      return 0
+    fi
+  elif [[ ! -f "$STATE_FILE" ]]; then
     printf ''
     return 0
   fi
-  jq -r "$expr // empty" "$STATE_FILE" 2>/dev/null || true
+  maybe_sudo jq -r "$expr // empty" "$STATE_FILE" 2>/dev/null || true
 }
 
 systemctl_prop() {
@@ -143,6 +173,10 @@ require_dm1_parity_raw="$(read_env_value DARKMESH_PROJECTION_REQUIRE_DM1_PARITY 
 trust_manifest_path="$(read_env_value DARKMESH_PROJECTION_TRUST_MANIFEST "")"
 state_dir="$(read_env_value DARKMESH_HOST_ROUTING_STATE_DIR "/var/lib/darkmesh/host-routing")"
 signer_allowlist="$(read_env_value DARKMESH_PROJECTION_SIGNER_ALLOWLIST "")"
+envReadable='false'
+stateReadable='false'
+can_read_path "$ENV_FILE" && envReadable='true'
+can_read_path "$STATE_FILE" && stateReadable='true'
 
 require_signed_json="$(bool_from_env "$require_signed_raw")"
 require_dm1_parity_json="$(bool_from_env "$require_dm1_parity_raw")"
@@ -207,6 +241,8 @@ report="$(jq -n \
   --arg projectionUrl "$projection_url" \
   --arg trustManifestPath "$trust_manifest_path" \
   --arg stateDir "$state_dir" \
+  --argjson envReadable "$envReadable" \
+  --argjson stateReadable "$stateReadable" \
   --arg stateMode "$state_mode" \
   --arg stateReason "$state_reason" \
   --arg stateVerificationReason "$state_verification_reason" \
@@ -233,9 +269,11 @@ report="$(jq -n \
       requireSigned: $requireSigned,
       requireDm1Parity: $requireDm1Parity,
       trustManifestPath: (if $trustManifestPath == "" then null else $trustManifestPath end),
-      signerAllowlistConfigured: $signerAllowlistConfigured
+      signerAllowlistConfigured: $signerAllowlistConfigured,
+      envReadable: $envReadable
     },
     state: {
+      readable: $stateReadable,
       mode: (if $stateMode == "" then null else $stateMode end),
       reason: (if $stateReason == "" then null else $stateReason end),
       sequence: $stateSequence,
