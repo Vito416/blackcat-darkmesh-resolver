@@ -367,6 +367,45 @@ decode_ar_payload_json() {
   return 1
 }
 
+fetch_cfg_json() {
+  local cfg_tx="$1"
+  local base_url="${2%/}"
+  local url=""
+  local payload=""
+  local cfg_json=""
+  local attempt=0
+
+  # Try the canonical tx data endpoint first, then the direct tx path for
+  # gateways that still return JSON there. Retry a couple of times because the
+  # public gateway path can be briefly flaky and we do not want to drop a host
+  # from the projection just because one fetch raced a transient gateway miss.
+  for url in \
+    "${base_url}/tx/${cfg_tx}/data" \
+    "${base_url}/${cfg_tx}"
+  do
+    for attempt in 1 2 3; do
+      payload="$(curl -fsS \
+        --retry 1 \
+        --retry-delay 1 \
+        --retry-connrefused \
+        --max-time 20 \
+        "$url" || true)"
+      if [[ -n "$payload" ]]; then
+        cfg_json="$(decode_ar_payload_json "$payload" || true)"
+        if [[ -n "$cfg_json" ]]; then
+          printf '%s' "$cfg_json"
+          return 0
+        fi
+      fi
+      if (( attempt < 3 )); then
+        sleep 1
+      fi
+    done
+  done
+
+  return 1
+}
+
 domains=()
 if [[ -n "$DOMAINS_CSV" ]]; then
   while IFS=',' read -r -a arr; do
@@ -425,14 +464,7 @@ for domain in "${domains[@]}"; do
     min_ttl="$ttl"
   fi
 
-  # Prefer canonical tx data endpoint to avoid gateway html wrappers.
-  cfg_payload="$(curl -sS --max-time 20 "${AR_BASE%/}/tx/${cfg_tx}/data" || true)"
-  cfg_json="$(decode_ar_payload_json "$cfg_payload" || true)"
-  if [[ -z "$cfg_json" ]]; then
-    # Fallback for gateways that still return direct JSON on /<txid>.
-    cfg_payload="$(curl -sS --max-time 20 "${AR_BASE%/}/${cfg_tx}" || true)"
-    cfg_json="$(decode_ar_payload_json "$cfg_payload" || true)"
-  fi
+  cfg_json="$(fetch_cfg_json "$cfg_tx" "$AR_BASE" || true)"
   if [[ -z "$cfg_json" ]]; then
     echo "${domain}: cfg tx ${cfg_tx} is not valid JSON payload" >>"$errors_tmp"
     continue
