@@ -289,6 +289,14 @@ bash ops/live-vps/local-tools/audit-resolver-runtime-posture.sh \
   --output /tmp/resolver-runtime-posture.json
 ```
 
+Check resolver-core completion posture:
+
+```bash
+bash ops/live-vps/local-tools/check-resolver-core-completion.sh \
+  --profile pre-onboarding-complete \
+  --output /tmp/resolver-core-completion.json
+```
+
 Use the signed projection helper:
 
 ```bash

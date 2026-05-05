@@ -164,5 +164,6 @@ The next best technical direction is still resolver-core work, not onboarding:
 Useful companion tool while doing that:
 
 - `ops/live-vps/local-tools/audit-resolver-runtime-posture.sh`
+- `ops/live-vps/local-tools/check-resolver-core-completion.sh`
 - workflow note:
   `docs/RESOLVER_RUNTIME_POSTURE_AUDIT_WORKFLOW_2026-05-05.md`

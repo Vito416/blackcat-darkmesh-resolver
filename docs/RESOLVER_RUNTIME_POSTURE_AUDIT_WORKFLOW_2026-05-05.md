@@ -18,6 +18,15 @@ closer to target mode" into one explicit runtime posture report.
 ## Script
 
 - `ops/live-vps/local-tools/audit-resolver-runtime-posture.sh`
+- companion completion gate:
+  - `ops/live-vps/local-tools/check-resolver-core-completion.sh`
+
+The companion gate turns the audit posture into a direct:
+
+- `ready`
+- `not ready`
+
+answer for resolver-core completion profiles.
 
 ## What it inspects
 
@@ -84,6 +93,31 @@ bash ops/live-vps/local-tools/audit-resolver-runtime-posture.sh \
   --state-file /tmp/nonexistent-darkmesh-state.json \
   --skip-systemctl
 ```
+
+Completion gate examples:
+
+```bash
+bash ops/live-vps/local-tools/check-resolver-core-completion.sh \
+  --profile production-stable \
+  --output /tmp/resolver-core-completion.production.json
+```
+
+```bash
+bash ops/live-vps/local-tools/check-resolver-core-completion.sh \
+  --profile pre-onboarding-complete \
+  --output /tmp/resolver-core-completion.pre-onboarding.json
+```
+
+Current profile meanings:
+
+- `production-stable`
+  - projection URL configured
+  - signed projection required
+  - sync timer enabled and active
+- `pre-onboarding-complete`
+  - everything in `production-stable`
+  - DM1 parity required
+  - projection-backed adapter no longer accepted as the desired end-state
 
 ## How to use it in the completion track
 
