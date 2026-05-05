@@ -77,6 +77,22 @@ The old public helper alias:
 
 is no longer part of the preferred minimal-surface live posture.
 
+## Relationship to onboarding
+
+This workflow is **not** the intended tenant onboarding UX.
+
+It is the operator/backend side that supports onboarding.
+
+The tenant-facing next phase should be web-first:
+
+- onboarding pages
+- DNS instructions
+- validation/status UI
+
+See:
+
+- `docs/RESOLVER_WEB_ONBOARDING_SPLIT_PLAN_2026-05-05.md`
+
 ## When to still use the async-worker helper path
 
 Only when you intentionally want the older helper/distribution flow:

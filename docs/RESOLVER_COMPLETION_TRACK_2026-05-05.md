@@ -32,6 +32,13 @@ That means the resolver-core completion gate is no longer blocked by:
 The next phase is no longer "finish the core gate"; it is packaging onboarding
 and productizing the three tenant modes cleanly.
 
+Important product direction:
+
+- tenant onboarding should be **web-first**
+- operator backend flow can stay **CLI/runbook-first**
+
+So the next phase should be split, not treated as one console product.
+
 ## Definition of "complete enough"
 
 For the current phase, DarkMesh Resolver is "complete enough" when all of the
@@ -52,7 +59,7 @@ This is mostly in place today.
 - AO-derived parity direction is clear
 - worker helper output is treated as transport/convenience, not truth
 
-This is partially in place today and still needs finishing work.
+This is now in place on the reference node.
 
 ### 3. AO-native read contract is explicit
 
@@ -117,10 +124,11 @@ stable enough.
 
 ### A. Projection-backed read adapter still carries the public alias path
 
-This is the biggest "not fully done yet" marker.
+This is no longer the reference-node blocker.
 
-We need to keep reducing reliance on that adapter without regressing live
-serving.
+The reference node now runs without the live projection-backed read adapter in
+its serving posture. Any remaining adapter references should be treated as
+legacy/helper material, not as the main completion blocker.
 
 ### B. AO-native semantic payload path is still not a reliable live assumption
 
@@ -133,34 +141,45 @@ That is acceptable operationally only because tooling now models this honestly.
 
 ### C. AO-derived activation parity is not fully closed
 
-DM1 parity scaffolding exists, but the end-state should be stronger:
+DM1 parity is now required on the reference node, but the longer-term end-state
+should still be stronger:
 
 - node verifies not only signature/freshness,
 - but also enough AO-derived truth to resist helper-plane drift.
 
-### D. Tenant onboarding is not yet turned into one polished operator story
+### D. Tenant onboarding is not yet turned into one polished web product
 
-The raw ingredients exist, but not yet the finished "this is how you onboard
-mode A / B / C" product experience.
+The raw ingredients exist, but not yet the finished web-first product
+experience for mode A / B / C.
 
 ## Recommended execution order
 
-### Phase 1 - finish resolver-core technical posture
+### Phase 1 - lock resolver-core as the backend baseline
 
 1. keep live projection publication / joined-node flows stable
-2. continue narrowing operator surfaces
-3. strengthen AO-derived parity and adapter exit strategy
-4. keep AO-native read contract explicit and honest
+2. keep minimal-surface operator posture stable
+3. keep AO-native read contract explicit and honest
 
-### Phase 2 - declare resolver-core stable
+### Phase 2 - split onboarding by audience
 
-Resolver-core is stable enough when:
+Build two distinct tracks:
 
-- the remaining transitional pieces are understood, documented, and operational
-- no hidden public dependency is required for normal operator flow
-- joined-node rollout story is repeatable
+1. **operator/backend track**
+   - release
+   - audits
+   - recovery
+   - control-plane visibility
+2. **tenant-facing web onboarding track**
+   - mode selection
+   - DNS instructions
+   - validation
+   - activation status
 
-### Phase 3 - build onboarding packs
+See also:
+
+- `docs/RESOLVER_WEB_ONBOARDING_SPLIT_PLAN_2026-05-05.md`
+
+### Phase 3 - build onboarding pages
 
 Only then package:
 
@@ -170,12 +189,14 @@ Only then package:
 
 ## Immediate next recommendation
 
-The next best technical direction is still resolver-core work, not onboarding:
+The next best direction is no longer "more core gate work first".
 
-1. keep pushing down the transitional reliance on the projection-backed read
-   adapter
-2. continue strengthening node-side AO-derived verification logic
-3. avoid widening public surface while doing it
+It is:
+
+1. define the backend contract that onboarding pages will call
+2. build the first web flow for `static tx`
+3. reuse that product frame for `static AO process`
+4. leave `dynamic AO` for the third onboarding page
 
 Useful companion tool while doing that:
 

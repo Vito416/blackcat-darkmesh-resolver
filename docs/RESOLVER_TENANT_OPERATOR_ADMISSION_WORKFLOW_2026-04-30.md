@@ -41,6 +41,14 @@ That is the security boundary.
 
 ## 3) Tenant workflow
 
+Important product direction:
+
+- tenant workflow should be **web-first**
+- operator workflow can stay **CLI/runbook-first**
+
+So the shell commands and release mechanics in this repo are not the intended
+tenant UX. They are the backend/operator side of the product.
+
 ## 3.1 What the tenant does
 
 Tenant responsibilities should stay minimal:
@@ -106,6 +114,11 @@ This is the mode we want for:
 - tx-backed sites
 - simple public sites
 
+Preferred tenant UX for this mode:
+
+- a web onboarding page
+- not a console walkthrough
+
 ### Mode B — secret app mode
 
 This is for sites that need secret-dependent behavior:
@@ -125,6 +138,22 @@ Important product rule:
 
 - the existence of secret app mode must **not** force simple public tenants to
   create a Worker just to publish a basic site
+
+## 3.4 Split the product surface
+
+The clean split should now be:
+
+- **tenant-facing onboarding pages**
+- **operator/backend resolver workflow**
+
+That means:
+
+- tenants see mode selection, DNS instructions, validation, and status pages
+- operators keep the deeper control-plane and recovery mechanics
+
+See also:
+
+- `docs/RESOLVER_WEB_ONBOARDING_SPLIT_PLAN_2026-05-05.md`
 
 ## 4) Operator workflow
 

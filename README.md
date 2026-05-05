@@ -104,6 +104,9 @@ Another scope decision is now explicit too:
   - static tx-backed sites
   - static AO process-backed sites
   - dynamic AO-backed sites
+- split that onboarding work into:
+  - private operator/backend workflow
+  - tenant-facing web onboarding pages
 - keep moving joined-node activation toward stronger AO-derived parity checks
 - improve AO-native read contracts without widening public surface
 
@@ -136,6 +139,11 @@ target is:
 That completion plan is tracked in:
 
 - `docs/RESOLVER_COMPLETION_TRACK_2026-05-05.md`
+
+And the onboarding split itself is tracked in:
+
+- `docs/RESOLVER_WEB_ONBOARDING_SPLIT_PLAN_2026-05-05.md`
+- `docs/RESOLVER_WEB_ONBOARDING_BACKEND_CONTRACT_2026-05-05.md`
 - `docs/RESOLVER_RUNTIME_POSTURE_AUDIT_WORKFLOW_2026-05-05.md`
 
 ## Replication model
