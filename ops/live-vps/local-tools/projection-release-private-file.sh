@@ -29,7 +29,7 @@ Examples:
     --ssh-target adminops@100.104.75.121 \
     --ssh-key ~/.ssh/darkmesh_new_vps_adminops \
     --switch-node-to-file-url 1 \
-    --verify-node-state-url https://hyperbeam.darkmesh.fun/~darkmesh-resolver@1.0/GetResolverState
+    --verify-node-state-via-ssh 1
 
 Important:
   This is the minimal-surface operator path. It does not require:
@@ -54,10 +54,14 @@ Options:
   --ssh-key <path>               SSH private key for the target.
   --remote-projection-path <p>   Default: /etc/darkmesh/projections/resolver-projection.active.v2.json
   --remote-env-file <path>       Default: /etc/darkmesh/resolver-projection.env
+  --remote-state-file <path>     Default: /var/lib/darkmesh/host-routing/state.json
   --switch-node-to-file-url <0|1>
                                  Update remote env to file:// verify-only mode.
                                  Default: 0
   --verify-node-state-url <u>    Poll this URL after live sync.
+  --verify-node-state-via-ssh <0|1>
+                                 Poll remote state.json over SSH after live sync.
+                                 Default: 0
   --node-wait-sec <n>            Default: 60
   --poll-interval-sec <n>        Default: 5
   --include-www                  Include www aliases. Default: on
@@ -123,6 +127,35 @@ wait_for_node_sequence() {
 
   rm -f "$tmp"
   echo "node activation timeout: $url (wanted active sequence >= $target_sequence)" >&2
+  return 1
+}
+
+wait_for_remote_node_sequence() {
+  local ssh_target="$1"
+  local target_sequence="$2"
+  local timeout_sec="$3"
+  local poll_sec="$4"
+  local remote_state_file="$5"
+  local deadline=$(( $(date +%s) + timeout_sec ))
+  local mode=""
+  local seq=""
+  local reason=""
+
+  while (( $(date +%s) <= deadline )); do
+    if read -r mode seq reason < <(
+      ssh "${SSH_ARGS[@]}" "$ssh_target" \
+        "sudo jq -r '[.mode // \"\", (.lastSequence // \"\" | tostring), .lastVerificationReason // \"\"] | @tsv' '$remote_state_file' 2>/dev/null" \
+        | awk -F '\t' 'NF >= 3 { print $1, $2, $3 }'
+    ); then
+      if [[ -n "$seq" && "$seq" =~ ^[0-9]+$ && "$seq" -ge "$target_sequence" && "$mode" == "active" ]]; then
+        echo "node activated via ssh: $ssh_target (sequence=$seq mode=$mode verificationReason=${reason:-unknown})"
+        return 0
+      fi
+    fi
+    sleep "$poll_sec"
+  done
+
+  echo "node activation timeout via ssh: $ssh_target (wanted active sequence >= $target_sequence)" >&2
   return 1
 }
 
@@ -216,8 +249,10 @@ SSH_TARGET="${DARKMESH_REFERENCE_NODE_SSH_TARGET:-}"
 SSH_KEY="${DARKMESH_REFERENCE_NODE_SSH_KEY:-}"
 REMOTE_PROJECTION_PATH="/etc/darkmesh/projections/resolver-projection.active.v2.json"
 REMOTE_ENV_FILE="/etc/darkmesh/resolver-projection.env"
+REMOTE_STATE_FILE="/var/lib/darkmesh/host-routing/state.json"
 SWITCH_NODE_TO_FILE_URL=0
 VERIFY_NODE_STATE_URL=""
+VERIFY_NODE_STATE_VIA_SSH=0
 NODE_WAIT_SEC=60
 POLL_INTERVAL_SEC=5
 DNS_URL=""
@@ -247,8 +282,10 @@ while [[ $# -gt 0 ]]; do
     --ssh-key) SSH_KEY="${2:-}"; shift 2 ;;
     --remote-projection-path) REMOTE_PROJECTION_PATH="${2:-}"; shift 2 ;;
     --remote-env-file) REMOTE_ENV_FILE="${2:-}"; shift 2 ;;
+    --remote-state-file) REMOTE_STATE_FILE="${2:-}"; shift 2 ;;
     --switch-node-to-file-url) SWITCH_NODE_TO_FILE_URL="${2:-}"; shift 2 ;;
     --verify-node-state-url) VERIFY_NODE_STATE_URL="${2:-}"; shift 2 ;;
+    --verify-node-state-via-ssh) VERIFY_NODE_STATE_VIA_SSH="${2:-}"; shift 2 ;;
     --node-wait-sec) NODE_WAIT_SEC="${2:-}"; shift 2 ;;
     --poll-interval-sec) POLL_INTERVAL_SEC="${2:-}"; shift 2 ;;
     --dns-url) DNS_URL="${2:-}"; shift 2 ;;
@@ -295,11 +332,24 @@ if [[ "$SWITCH_NODE_TO_FILE_URL" != "0" && "$SWITCH_NODE_TO_FILE_URL" != "1" ]];
   echo "--switch-node-to-file-url must be 0 or 1" >&2
   exit 2
 fi
+if [[ "$VERIFY_NODE_STATE_VIA_SSH" != "0" && "$VERIFY_NODE_STATE_VIA_SSH" != "1" ]]; then
+  echo "--verify-node-state-via-ssh must be 0 or 1" >&2
+  exit 2
+fi
 
 if (( EXECUTE_LIVE == 1 )); then
   [[ -n "$SSH_TARGET" ]] || { echo "--ssh-target is required when --execute-live 1" >&2; exit 2; }
   require_cmd ssh
   require_cmd scp
+fi
+
+if (( VERIFY_NODE_STATE_VIA_SSH == 1 && EXECUTE_LIVE != 1 )); then
+  echo "--verify-node-state-via-ssh 1 requires --execute-live 1" >&2
+  exit 2
+fi
+if (( VERIFY_NODE_STATE_VIA_SSH == 1 )) && [[ -z "$SSH_TARGET" ]]; then
+  echo "--verify-node-state-via-ssh 1 requires --ssh-target" >&2
+  exit 2
 fi
 
 if (( SWITCH_NODE_TO_FILE_URL == 1 && EXECUTE_LIVE != 1 )); then
@@ -495,6 +545,10 @@ if [[ -n "$VERIFY_NODE_STATE_URL" ]]; then
   echo "waiting for joined node activation..."
   wait_for_node_sequence "$VERIFY_NODE_STATE_URL" "$PUBLISHED_SEQUENCE" "$NODE_WAIT_SEC" "$POLL_INTERVAL_SEC"
 fi
+if (( VERIFY_NODE_STATE_VIA_SSH == 1 )); then
+  echo "waiting for joined node activation via ssh..."
+  wait_for_remote_node_sequence "$SSH_TARGET" "$PUBLISHED_SEQUENCE" "$NODE_WAIT_SEC" "$POLL_INTERVAL_SEC" "$REMOTE_STATE_FILE"
+fi
 
 jq -n \
   --arg mode "remote_installed" \
@@ -502,10 +556,12 @@ jq -n \
   --arg sshTarget "$SSH_TARGET" \
   --arg remoteProjectionPath "$REMOTE_PROJECTION_PATH" \
   --arg remoteEnvFile "$REMOTE_ENV_FILE" \
+  --arg remoteStateFile "$REMOTE_STATE_FILE" \
   --arg snapshotId "$PUBLISHED_SNAPSHOT_ID" \
   --arg keyId "$PUBLISHED_KEY_ID" \
   --arg payloadHash "$PUBLISHED_PAYLOAD_HASH" \
   --arg verifyNodeStateUrl "$VERIFY_NODE_STATE_URL" \
+  --argjson verifyNodeStateViaSsh "$( [[ "$VERIFY_NODE_STATE_VIA_SSH" == "1" ]] && echo true || echo false )" \
   --argjson executeLive true \
   --argjson switchNodeToFileUrl "$( [[ "$SWITCH_NODE_TO_FILE_URL" == "1" ]] && echo true || echo false )" \
   --argjson sequence "$PUBLISHED_SEQUENCE" \
@@ -513,10 +569,12 @@ jq -n \
     mode:$mode,
     executeLive:$executeLive,
     switchNodeToFileUrl:$switchNodeToFileUrl,
+    verifyNodeStateViaSsh:$verifyNodeStateViaSsh,
     outputDir:$outputDir,
     sshTarget:$sshTarget,
     remoteProjectionPath:$remoteProjectionPath,
     remoteEnvFile:$remoteEnvFile,
+    remoteStateFile:$remoteStateFile,
     verifyNodeStateUrl:(if $verifyNodeStateUrl == "" then null else $verifyNodeStateUrl end),
     published:{snapshotId:$snapshotId,sequence:$sequence,keyId:$keyId,payloadHash:$payloadHash}
   }' >"$METADATA_PATH"

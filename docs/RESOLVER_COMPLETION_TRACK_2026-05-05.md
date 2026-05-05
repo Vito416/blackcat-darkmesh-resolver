@@ -16,6 +16,22 @@ The key discipline here is:
   - static AO process-backed sites,
   - dynamic AO-backed sites.
 
+## Current checkpoint
+
+As of 2026-05-05, the reference node posture now satisfies:
+
+- `production-stable`
+- `pre-onboarding-complete`
+
+That means the resolver-core completion gate is no longer blocked by:
+
+- signature-only activation
+- missing DM1 parity requirement
+- projection-backed read adapter in the live serving posture
+
+The next phase is no longer "finish the core gate"; it is packaging onboarding
+and productizing the three tenant modes cleanly.
+
 ## Definition of "complete enough"
 
 For the current phase, DarkMesh Resolver is "complete enough" when all of the

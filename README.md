@@ -80,34 +80,42 @@ Another scope decision is now explicit too:
 
 - shared signed projection publication is live
 - joined-node verify-only activation is live
+- DM1 parity required activation is live on the reference node
 - nginx `map`-based host routing is live
 - minimal exposed surface posture is documented and reflected in current
   operator tooling defaults
 - AO-native read health is surfaced into control-state as a first-class
   operator signal
+- the reference node now satisfies the `pre-onboarding-complete` completion gate
 
 ### Still transitional
 
-- the public alias path still depends on the projection-backed read adapter
 - AO runtime readback is still practically `runtime_effect_only`, not rich
   semantic payload delivery
 - worker control helpers still exist as operator convenience surfaces, even
   though normal flow is being narrowed
+- legacy async-worker bearer-token release tooling still exists as a
+  compatibility helper, even though the preferred operator path is now private
+  file release over Tailscale/SSH
 
 ### Next real technical goals
 
-- reduce reliance on the projection-backed read adapter
+- package onboarding cleanly for:
+  - static tx-backed sites
+  - static AO process-backed sites
+  - dynamic AO-backed sites
 - keep moving joined-node activation toward stronger AO-derived parity checks
 - improve AO-native read contracts without widening public surface
 
 ## Known limitations
 
-- the public resolver alias still uses the projection-backed adapter instead of
-  a fully AO-native serving path
 - AO runtime reads are still healthiest at the `runtime_effect_only` contract
   level; rich semantic payload delivery is not yet a safe default assumption
 - worker-side control helpers are still present as operator convenience tools,
   even though we are actively narrowing normal flow away from them
+- the old public helper alias `~darkmesh-resolver@1.0/*` is no longer part of
+  the minimal-surface reference-node posture; operator state checks should use
+  private SSH/runtime audit instead
 - tenant onboarding modes are not yet packaged as a finished operator-facing
   resolver product; that is the next completion phase
 
@@ -355,7 +363,7 @@ bash ops/live-vps/local-tools/projection-release-private-file.sh \
   --ssh-target adminops@100.104.75.121 \
   --ssh-key ~/.ssh/darkmesh_new_vps_adminops \
   --switch-node-to-file-url 1 \
-  --verify-node-state-url https://hyperbeam.darkmesh.fun/~darkmesh-resolver@1.0/GetResolverState
+  --verify-node-state-via-ssh 1
 ```
 
 That path:
@@ -363,6 +371,8 @@ That path:
 - signs locally with `~/.config/darkmesh/projection-signer-2026-q2`
 - copies the signed artifact to the joined node over Tailscale/private SSH
 - can flip the joined node into `file://` verify-only mode
+- can wait on remote `state.json` over SSH, without relying on the old public
+  resolver helper alias
 - does **not** require `RESOLVER_*_AUTH_TOKEN`
 
 The older async-worker bearer-token release path remains available as a

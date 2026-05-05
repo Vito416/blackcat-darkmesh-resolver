@@ -28,7 +28,7 @@ bash ops/live-vps/local-tools/projection-release-private-file.sh \
   --ssh-target adminops@100.104.75.121 \
   --ssh-key ~/.ssh/darkmesh_new_vps_adminops \
   --switch-node-to-file-url 1 \
-  --verify-node-state-url https://hyperbeam.darkmesh.fun/~darkmesh-resolver@1.0/GetResolverState
+  --verify-node-state-via-ssh 1
 ```
 
 ## What it does
@@ -45,7 +45,9 @@ bash ops/live-vps/local-tools/projection-release-private-file.sh \
    - `DARKMESH_PROJECTION_REQUIRE_SIGNED=1`
    - `DARKMESH_DM1_AUTOBUILD=0`
 6. starts `darkmesh-host-routing-sync.service`
-7. optionally waits for node state to become `active`
+7. optionally waits for node state to become `active`, either:
+   - through remote `state.json` over SSH
+   - or through an explicit helper URL if you intentionally still expose one
 
 ## Important stance
 
@@ -60,6 +62,20 @@ It does **not** require:
 Those variables still exist in compatibility tooling for the older async-worker
 helper path, but they are no longer the preferred default for routine operator
 releases.
+
+## Current reference-node posture
+
+On the reference node we now intentionally prefer:
+
+- private SSH/runtime-audit checks
+- `file://` signed snapshot activation
+- DM1 parity required activation
+
+The old public helper alias:
+
+- `~darkmesh-resolver@1.0/*`
+
+is no longer part of the preferred minimal-surface live posture.
 
 ## When to still use the async-worker helper path
 
